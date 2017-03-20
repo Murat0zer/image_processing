@@ -314,7 +314,7 @@ vector<int> Islemler::calculateIntensityOklitThreshold(vector<Vertex*> histogram
 	vector<Vertex*> agirlikMerkezleri(rastgeleAgirlikMerkezleriOlustur(renkAdet));
 	vector<Vertex*> tempAgirlikMerkezleri(rastgeleAgirlikMerkezleriOlustur(renkAdet));
 	// kumelerin toplam x y degerleri. z kumedeki nokta sayisi.
-	vector<Vertex*> clusterSums; for (int i = 0; i < renkAdet; i++) { clusterSums.push_back(new Vertex()); }
+	vector<Vertex*> clusterSums;
 	vector<float> uzakliklar;
 	bool done = false;
 	while (!done)
