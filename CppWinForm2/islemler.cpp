@@ -291,24 +291,7 @@ vector<Vertex*> Islemler::rastgeleAgirlikMerkezleriOlustur(int renkAdet)
 	return agirlikMerkezleri;
 }
 
-float Islemler::oklitDistance(Vertex pixel, Vertex agirlikMerkez)
-{
-	float distance = Math::Abs(Math::Sqrt(Math::Pow(Math::Abs(agirlikMerkez.getX() - pixel.getX()), 2)
-		+ Math::Pow((Math::Abs(agirlikMerkez.getY() - pixel.getY())), 2)));
-	return  distance;
-}
-
-vector<int> Islemler::calculateRgbOklitThreshold(vector<Vertex*> histogram, int renkAdet)
-{
-	return vector<int>();
-}
-
-vector<int> Islemler::calculateRgbMahalanobisThreshold(vector<Vertex*> histogram, int renkAdet)
-{
-	return vector<int>();
-}
-
-vector<int> Islemler::calculateIntensityOklitThreshold(vector<Vertex*> histogram, int renkAdet)
+vector<int> Islemler::calculateThreshold(vector<Vertex*> histogram, int renkAdet,String ^ mode)
 {
 	// 3boyutlu vektor. x y merkezin koordinantlari. ignore z.
 	vector<Vertex*> agirlikMerkezleri(rastgeleAgirlikMerkezleriOlustur(renkAdet));
@@ -327,7 +310,10 @@ vector<int> Islemler::calculateIntensityOklitThreshold(vector<Vertex*> histogram
 			for (int j = 0; j < renkAdet; j++)
 			{
 				Vertex pixel = new Vertex(); pixel.setX(i); pixel.setY(histogram[i]->getX()); pixel.setZ(0.0);
-				uzakliklar.push_back(oklitDistance(pixel, agirlikMerkezleri[j]));
+				if (mode == "oklit")
+					uzakliklar.push_back(oklitDistance(pixel, agirlikMerkezleri[j]));
+				else
+					;// mahalanobis distance hesabi yapilacak kisim.
 			}
 			// noktanin minumum uzaklikta oldugu kumenin indisini dondurur.
 			int minUzaklik = (min_element(uzakliklar.begin(), uzakliklar.end())) - uzakliklar.begin();
@@ -353,15 +339,15 @@ vector<int> Islemler::calculateIntensityOklitThreshold(vector<Vertex*> histogram
 		{
 			float xTemp = tempAgirlikMerkezleri[m]->getX();
 			float yTemp = tempAgirlikMerkezleri[m]->getY();
-			float xNew =  agirlikMerkezleri[m]->getX();
+			float xNew = agirlikMerkezleri[m]->getX();
 			float yNew = agirlikMerkezleri[m]->getY();
 			if (xTemp == xNew && yTemp == yNew)
-				gerekliEsitlikSayisi++;			
+				gerekliEsitlikSayisi++;
 		}
-		if (gerekliEsitlikSayisi  == renkAdet)
+		if (gerekliEsitlikSayisi == renkAdet)
 			done = true;
 	}
-							// elde ettigimiz agirlik merkezinin x degerleriyle threshold hesapliyoruz.
+	// elde ettigimiz agirlik merkezinin x degerleriyle threshold hesapliyoruz.
 	vector<int> thresholds; vector<int> xValues;
 
 	for each(Vertex agirlikMerkez in agirlikMerkezleri)
@@ -370,7 +356,7 @@ vector<int> Islemler::calculateIntensityOklitThreshold(vector<Vertex*> histogram
 	sort(xValues.begin(), xValues.end());
 	vector<int>::iterator  xValue = xValues.begin();
 	int a = 0;
-	for (int p = 0; p<renkAdet-1; p++)
+	for (int p = 0; p<renkAdet - 1; p++)
 	{
 		int xvalueOld = *xValue++;
 		int threshold = (*xValue + xvalueOld) / 2;
@@ -378,10 +364,99 @@ vector<int> Islemler::calculateIntensityOklitThreshold(vector<Vertex*> histogram
 	}
 	return thresholds;
 }
+float Islemler::oklitDistance(Vertex pixel, Vertex agirlikMerkez)
+{
+	float distance = Math::Abs(Math::Sqrt(Math::Pow(Math::Abs(agirlikMerkez.getX() - pixel.getX()), 2)
+		+ Math::Pow((Math::Abs(agirlikMerkez.getY() - pixel.getY())), 2)));
+	return  distance;
+}
+
+vector<vector<int>> Islemler::calculateRgbOklitThreshold(vector<Vertex*> histogram, int renkAdet)
+{	
+	//vector<Vertex*> rgbThresholds;
+	vector<vector<int>> rgbThresholds;
+	rgbThresholds.push_back(calculateIntensityOklitThreshold(histogram, renkAdet));
+	// calculeteintensityoklit threshold histogramin sadece x degerleri icin calisir.once x le y i sonra x le z yi
+	// swapliyoruz boylece histogramdaki rgb degerleri icin ayri ayri thresholdlari elde ediyoruz. :(
+	for (int i = 0; i < 255; i++)
+		histogram[i]->setX(histogram[i]->getY());
+	rgbThresholds.push_back(this->calculateIntensityOklitThreshold(histogram, renkAdet));
+	for (int i = 0; i < 255; i++)
+		histogram[i]->setX(histogram[i]->getZ());
+	rgbThresholds.push_back(this->calculateIntensityOklitThreshold(histogram, renkAdet));
+	
+	return rgbThresholds;
+}
+
+vector<int> Islemler::calculateRgbMahalanobisThreshold(vector<Vertex*> histogram, int renkAdet)
+{
+	return vector<int>();
+}
+
+vector<int> Islemler::calculateIntensityOklitThreshold(vector<Vertex*> histogram, int renkAdet)
+{
+	return calculateThreshold(histogram, renkAdet, "oklit");
+}
 
 vector<int> Islemler::calculateIntensityMahalanobisThreshold(vector<Vertex*> histogram, int renkAdet)
 {
 	return vector<int>();
+}
+
+BYTE * Islemler::thresholdBasedSegmentationRGB(BYTE * buffer, vector<vector<int>> thresholds, int height, int width)
+{
+	BYTE * bufferNew = new BYTE[width*height * 3];
+	int rgb = 0;
+	for each(vector<int> rgbThreshold in thresholds)
+	{
+		
+		int color = 255 / (rgbThreshold.size() + 1);
+		vector<int>::iterator  threshold = rgbThreshold.begin();
+		
+		for (int i = 0; i < width*height * 3; i+=3)
+		{
+			int colorX = 1;
+			for each(int thrshldValue in rgbThreshold)
+			{
+				if (rgb == 0)
+				{
+					if (buffer[i] < thrshldValue)
+					{
+						bufferNew[i] = color * colorX;
+						break;
+					}
+					colorX++;
+					if (colorX - 1 == thresholds.size())
+						bufferNew[i] = color * colorX;
+				}
+				if (rgb == 1)
+				{
+					if (buffer[i+1] < thrshldValue)
+					{
+						bufferNew[i+1] = color * colorX;
+						break;
+					}
+					colorX++;
+					if (colorX - 1 == thresholds.size())
+						bufferNew[i+1] = color * colorX;
+				}
+				if (rgb == 2)
+				{
+					if (buffer[i + 2] < thrshldValue)
+					{
+						bufferNew[i + 2] = color * colorX;
+						break;
+					}
+					colorX++;
+					if (colorX - 1 == thresholds.size())
+						bufferNew[i + 2] = color * colorX;
+				}
+			}
+		}
+
+		rgb++;
+	}
+	return bufferNew;
 }
 
 System::Void Islemler::thresholdBasedSegmentationIntensity(BYTE * buffer, vector<int> thresholds, int height, int width)
@@ -390,7 +465,7 @@ System::Void Islemler::thresholdBasedSegmentationIntensity(BYTE * buffer, vector
 	int color = 255 / (thresholds.size()+1);
 	vector<int>::iterator  threshold = thresholds.begin();
 	
-		for (int row = 0; row < height; row++)				  // Resmin pixellerini dolasmak
+		for (int row = 0; row < height; row++)				// Resmin pixellerini dolasmak
 			for (int column = 0; column < width; column++) // icin gerekli.
 			{
 				int colorX = 1;

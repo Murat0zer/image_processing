@@ -276,7 +276,9 @@ System::Void CppWinForm2::MyForm::buttonBlackWhite_Click(System::Object ^ sender
 	resim->setOutput(stringToLPCTSTR(textBoxKayitYoluFH->Text));
 	
 }
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////Segmentation///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 System::Void CppWinForm2::MyForm::buttonResimSecSegment_Click(System::Object ^ sender, System::EventArgs ^ e)
 {
 	resimYukle(labelDosyaYoluSegment, textBoxSegment, pictureBoxSegmentOrj);
@@ -292,13 +294,35 @@ System::Void CppWinForm2::MyForm::buttonProcess_Click(System::Object ^ sender, S
 		MessageBox::Show("Gecersiz deger");
 	}
 	vector<Vertex*>  histogram;
+	histogram = islem.histogramHesapla(resim->getBuffer(), *resim->getWidth(), *resim->getHeight(), "rgb");
+	islem.histogramCiz(histogram, chartSegOrj, "rgb");
+	
 	if (radioButtonRGB->Checked)
 	{		
-		histogram = islem.histogramHesapla(resim->getBuffer(), *resim->getWidth(), *resim->getHeight(), "rgb");
-		islem.histogramCiz(histogram, chartSegOrj, "rgb");
+		
 		if (radioButtonOklit->Checked)
 		{
+			BYTE * buffer;
+			vector<vector<int>> thresholds = islem.calculateRgbOklitThreshold(histogram, renkAdet);
+			buffer = islem.thresholdBasedSegmentationRGB(
+				resim->getBuffer(),
+				thresholds,
+				*resim->getHeight(),
+				*resim->getWidth());
 
+			long  newSize = (*resim->getWidth() * *resim->getHeight() * 3);
+			if (!SaveBMP(buffer,
+				*resim->getWidth(),
+				*resim->getHeight(),
+				newSize,
+				stringToLPCTSTR(textBoxSegment->Text)))
+			{
+				MessageBox::Show("islem basarisiz"); return;
+			}
+			pictureBoxOklit->Image = Image::FromStream(gcnew  MemoryStream(File::ReadAllBytes(textBoxSegment->Text)));
+			resim->setOutput(stringToLPCTSTR(textBoxSegment->Text));
+			histogram = islem.histogramHesapla(buffer, *resim->getWidth(), *resim->getHeight(), "rgb");
+			islem.histogramCiz(histogram, chartSegOklit, "rgb");
 		}
 		if (radioButtonMahalonobis->Checked)
 		{
@@ -311,8 +335,13 @@ System::Void CppWinForm2::MyForm::buttonProcess_Click(System::Object ^ sender, S
 			resim->getBuffer(),
 			*resim->getWidth(),
 			*resim->getHeight()));
-		histogram = islem.histogramHesapla(resim->getRawIntensity(), *resim->getWidth(), *resim->getHeight(), "intensity");
-		// islem.histogramCiz(histogram, chartSegOklit, "intensity");
+
+		histogram = islem.histogramHesapla(
+			resim->getRawIntensity(),
+			*resim->getWidth(),
+			*resim->getHeight(),
+			"intensity");
+
 		if (radioButtonOklit->Checked)
 		{
 			vector<int> thresholds = islem.calculateIntensityOklitThreshold(histogram, renkAdet);
@@ -322,14 +351,11 @@ System::Void CppWinForm2::MyForm::buttonProcess_Click(System::Object ^ sender, S
 				thresholds,
 				*resim->getHeight(),
 				*resim->getWidth());
-
 			resim->setDisplayImage(ConvertIntensityToBMP(
 				resim->getRawIntensity(),
 				*resim->getWidth(),
 				*resim->getHeight(),
 				resim->getNewSize()));
-
-			resim->setOutput(stringToLPCTSTR(textBoxSegment->Text));
 
 			if (!SaveBMP(resim->getDisplayImage(),
 				*resim->getWidth(),
@@ -341,6 +367,8 @@ System::Void CppWinForm2::MyForm::buttonProcess_Click(System::Object ^ sender, S
 			}
 			pictureBoxOklit->Image = Image::FromStream(gcnew  MemoryStream(File::ReadAllBytes(textBoxSegment->Text)));
 			resim->setOutput(stringToLPCTSTR(textBoxSegment->Text));
+			histogram = islem.histogramHesapla(resim->getRawIntensity(), *resim->getWidth(), *resim->getHeight(), "intensity");
+			islem.histogramCiz(histogram, chartSegOklit, "intensity");
 
 		}
 		if (radioButtonMahalonobis->Checked)
