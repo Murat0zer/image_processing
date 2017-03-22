@@ -6,6 +6,7 @@
 #include <math.h>
 #include <msclr\marshal.h>
 #include <vector>
+#include <chrono>  // for high_resolution_clock
 //User defined includes
 #include "imge_bmp.h"
 #include "islemler.h"
@@ -286,6 +287,8 @@ System::Void CppWinForm2::MyForm::buttonResimSecSegment_Click(System::Object ^ s
 
 System::Void CppWinForm2::MyForm::buttonProcess_Click(System::Object ^ sender, System::EventArgs ^ e)
 {
+	auto start = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double>  elapsed;
 	int renkAdet = 2;
 	try {
 		 renkAdet = Convert::ToInt32(textBoxRenkAdet->Text);
@@ -304,12 +307,12 @@ System::Void CppWinForm2::MyForm::buttonProcess_Click(System::Object ^ sender, S
 		{
 			BYTE * buffer;
 			vector<vector<int>> thresholds = islem.calculateRgbOklitThreshold(histogram, renkAdet);
+			
 			buffer = islem.thresholdBasedSegmentationRGB(
 				resim->getBuffer(),
 				thresholds,
 				*resim->getHeight(),
 				*resim->getWidth());
-
 			long  newSize = (*resim->getWidth() * *resim->getHeight() * 3);
 			if (!SaveBMP(buffer,
 				*resim->getWidth(),
@@ -377,7 +380,9 @@ System::Void CppWinForm2::MyForm::buttonProcess_Click(System::Object ^ sender, S
 		}
 	}
 	
-	
+	auto finish = std::chrono::high_resolution_clock::now();
+	elapsed = finish - start;
+	labelTimer->Text = Convert::ToString(elapsed.count()) +  " saniyede  bitirildi.";
 }
 
 

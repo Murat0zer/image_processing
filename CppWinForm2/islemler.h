@@ -15,6 +15,7 @@ private:
 	float oklitDistance(Vertex pixel, Vertex agirlikMerkez);
 	vector<int> calculateThreshold(vector<Vertex*> histogram, int renkAdet, String ^ mode);
 	vector<Vertex*> rastgeleAgirlikMerkezleriOlustur(int renkAdet);
+	INT * vectorToArray(INT * myArray, vector<int> vector);
 
 public:
 	Islemler();

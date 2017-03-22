@@ -291,6 +291,7 @@ vector<Vertex*> Islemler::rastgeleAgirlikMerkezleriOlustur(int renkAdet)
 	return agirlikMerkezleri;
 }
 
+
 vector<int> Islemler::calculateThreshold(vector<Vertex*> histogram, int renkAdet,String ^ mode)
 {
 	// 3boyutlu vektor. x y merkezin koordinantlari. ignore z.
@@ -373,19 +374,19 @@ float Islemler::oklitDistance(Vertex pixel, Vertex agirlikMerkez)
 
 vector<vector<int>> Islemler::calculateRgbOklitThreshold(vector<Vertex*> histogram, int renkAdet)
 {	
-	//vector<Vertex*> rgbThresholds;
-	vector<vector<int>> rgbThresholds;
-	rgbThresholds.push_back(calculateIntensityOklitThreshold(histogram, renkAdet));
+	//vector<Vertex*> rgbThresholdss;
+	vector<vector<int>> rgbThresholdss;
+	rgbThresholdss.push_back(calculateIntensityOklitThreshold(histogram, renkAdet));
 	// calculeteintensityoklit threshold histogramin sadece x degerleri icin calisir.once x le y i sonra x le z yi
 	// swapliyoruz boylece histogramdaki rgb degerleri icin ayri ayri thresholdlari elde ediyoruz. :(
 	for (int i = 0; i < 255; i++)
 		histogram[i]->setX(histogram[i]->getY());
-	rgbThresholds.push_back(this->calculateIntensityOklitThreshold(histogram, renkAdet));
+	rgbThresholdss.push_back(this->calculateIntensityOklitThreshold(histogram, renkAdet));
 	for (int i = 0; i < 255; i++)
 		histogram[i]->setX(histogram[i]->getZ());
-	rgbThresholds.push_back(this->calculateIntensityOklitThreshold(histogram, renkAdet));
+	rgbThresholdss.push_back(this->calculateIntensityOklitThreshold(histogram, renkAdet));
 	
-	return rgbThresholds;
+	return rgbThresholdss;
 }
 
 vector<int> Islemler::calculateRgbMahalanobisThreshold(vector<Vertex*> histogram, int renkAdet)
@@ -403,58 +404,102 @@ vector<int> Islemler::calculateIntensityMahalanobisThreshold(vector<Vertex*> his
 	return vector<int>();
 }
 
+INT * Islemler::vectorToArray(INT * myArray, vector<int> vector)
+{
+	int i = 0;
+	for each(int  thresholdValue in vector)
+	{
+		myArray[i] = thresholdValue;
+		i++;
+	}
+	return myArray;
+}
 BYTE * Islemler::thresholdBasedSegmentationRGB(BYTE * buffer, vector<vector<int>> thresholds, int height, int width)
 {
-	BYTE * bufferNew = new BYTE[width*height * 3];
-	int rgb = 0;
-	for each(vector<int> rgbThreshold in thresholds)
-	{
-		
-		int color = 255 / (rgbThreshold.size() + 1);
-		vector<int>::iterator  threshold = rgbThreshold.begin();
-		
-		for (int i = 0; i < width*height * 3; i+=3)
+	enum Renk { red, green, blue };
+	BYTE * bufferNew = new BYTE[width * height * 3];
+	int rgb = red;
+	vector<vector<int>>::iterator  rgbThresholds = thresholds.begin();
+	//vector<int>::iterator  thresholds = rgbThresholds[red].begin();
+	int thresholdSize = rgbThresholds[red].size();
+	int color = 255 / (thresholdSize + 1);
+
+	// degerleri vector den arraya aliyoruz. daha iyi performans icin.////////////////////////////////////////
+	INT * redThresholds = new INT[rgbThresholds[red].size()];
+	INT * blueThresholds = new INT[rgbThresholds[green].size()];
+	INT * greenThresholds = new INT[rgbThresholds[blue].size()];
+	vectorToArray(redThresholds, rgbThresholds[red]);
+	vectorToArray(greenThresholds, rgbThresholds[green]);
+	vectorToArray(blueThresholds, rgbThresholds[blue]);
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	for (int i = 0; i < width*height * 3; i += 3)
+	{			
+		int redValue = buffer[i + red];
+		int greenValue = buffer[i + green];
+		int blueValue = buffer[i + blue];
+		int colorX = 1;	
+
+		for (int j = 0; j < thresholdSize; j++)
 		{
-			int colorX = 1;
-			for each(int thrshldValue in rgbThreshold)
+			int newValue = 0;
+			
+			if (redValue < redThresholds[j])
+			{	
+				if (j - 1 < 0)
+					newValue = (redThresholds[j]) / 2;
+				else
+					newValue = (redThresholds[j] + redThresholds[j - 1]) / 2;
+				bufferNew[i + red] = newValue;
+				break;
+			}
+			colorX++;
+			if (colorX - 1 == thresholdSize)
 			{
-				if (rgb == 0)
-				{
-					if (buffer[i] < thrshldValue)
-					{
-						bufferNew[i] = color * colorX;
-						break;
-					}
-					colorX++;
-					if (colorX - 1 == thresholds.size())
-						bufferNew[i] = color * colorX;
-				}
-				if (rgb == 1)
-				{
-					if (buffer[i+1] < thrshldValue)
-					{
-						bufferNew[i+1] = color * colorX;
-						break;
-					}
-					colorX++;
-					if (colorX - 1 == thresholds.size())
-						bufferNew[i+1] = color * colorX;
-				}
-				if (rgb == 2)
-				{
-					if (buffer[i + 2] < thrshldValue)
-					{
-						bufferNew[i + 2] = color * colorX;
-						break;
-					}
-					colorX++;
-					if (colorX - 1 == thresholds.size())
-						bufferNew[i + 2] = color * colorX;
-				}
+				newValue = (redThresholds[j] + 255) / 2;
+				bufferNew[i + red] = newValue;
 			}
 		}
 
-		rgb++;
+		for (int j = 0; j < thresholdSize; j++)
+		{
+			int newValue = 0;
+			if (greenValue < greenThresholds[j])
+			{
+				if (j - 1 < 0)
+					newValue = (greenThresholds[j]) / 2;
+				else
+					newValue = (greenThresholds[j] + greenThresholds[j - 1]) / 2;
+				bufferNew[i + green] = newValue;
+				break;
+			}
+			colorX++;
+			if (colorX - 1 == thresholdSize)
+			{
+				newValue = (greenThresholds[j] + 255) / 2;
+				bufferNew[i + green] = newValue;
+			}
+		}
+
+		for (int j = 0; j < thresholdSize; j++)
+		{
+			int newValue = 0;
+			if (blueValue < blueThresholds[j])
+			{
+				if (j - 1 < 0)
+					newValue = (blueThresholds[j]) / 2;
+				else
+					newValue = (blueThresholds[j] + blueThresholds[j - 1]) / 2;
+				bufferNew[i + blue] = newValue;
+				break;
+			}
+			colorX++;
+			if (colorX - 1 == thresholdSize)
+			{
+				newValue = (blueThresholds[j] + 255) / 2;
+				bufferNew[i + blue] = newValue;
+			}
+		}
+			
 	}
 	return bufferNew;
 }

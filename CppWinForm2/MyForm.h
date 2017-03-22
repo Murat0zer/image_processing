@@ -102,6 +102,9 @@ namespace CppWinForm2 {
 
 	private: System::Windows::Forms::DataVisualization::Charting::Chart^  chartSegOklit;
 	private: System::Windows::Forms::DataVisualization::Charting::Chart^  chartSegOrj;
+	private: System::Windows::Forms::Timer^  timer1;
+	private: System::Windows::Forms::Label^  labelTimer;
+	private: System::ComponentModel::IContainer^  components;
 
 
 
@@ -112,7 +115,7 @@ namespace CppWinForm2 {
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
-		System::ComponentModel::Container ^components;
+
 
 #pragma region Windows Form Designer generated code
 		/// <summary>
@@ -121,6 +124,7 @@ namespace CppWinForm2 {
 		/// </summary>
 		void InitializeComponent(void)
 		{
+			this->components = (gcnew System::ComponentModel::Container());
 			System::Windows::Forms::DataVisualization::Charting::ChartArea^  chartArea1 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
 			System::Windows::Forms::DataVisualization::Charting::Legend^  legend1 = (gcnew System::Windows::Forms::DataVisualization::Charting::Legend());
 			System::Windows::Forms::DataVisualization::Charting::Series^  series1 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
@@ -179,6 +183,7 @@ namespace CppWinForm2 {
 			this->tabPageSegmentation = (gcnew System::Windows::Forms::TabPage());
 			this->chartSegMahalonobis = (gcnew System::Windows::Forms::DataVisualization::Charting::Chart());
 			this->chartSegOklit = (gcnew System::Windows::Forms::DataVisualization::Charting::Chart());
+			this->chartSegOrj = (gcnew System::Windows::Forms::DataVisualization::Charting::Chart());
 			this->buttonProcess = (gcnew System::Windows::Forms::Button());
 			this->panelRadioButtonImageMode = (gcnew System::Windows::Forms::Panel());
 			this->radioButtonIntensity = (gcnew System::Windows::Forms::RadioButton());
@@ -193,7 +198,8 @@ namespace CppWinForm2 {
 			this->radioButtonOklit = (gcnew System::Windows::Forms::RadioButton());
 			this->pictureBoxOklit = (gcnew System::Windows::Forms::PictureBox());
 			this->pictureBoxSegmentOrj = (gcnew System::Windows::Forms::PictureBox());
-			this->chartSegOrj = (gcnew System::Windows::Forms::DataVisualization::Charting::Chart());
+			this->timer1 = (gcnew System::Windows::Forms::Timer(this->components));
+			this->labelTimer = (gcnew System::Windows::Forms::Label());
 			this->tabControl1->SuspendLayout();
 			this->tabPageCemberCiz->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxCember))->BeginInit();
@@ -204,11 +210,11 @@ namespace CppWinForm2 {
 			this->tabPageSegmentation->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chartSegMahalonobis))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chartSegOklit))->BeginInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chartSegOrj))->BeginInit();
 			this->panelRadioButtonImageMode->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxMahalonois))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxOklit))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxSegmentOrj))->BeginInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chartSegOrj))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// tabControl1
@@ -564,6 +570,7 @@ namespace CppWinForm2 {
 			// tabPageSegmentation
 			// 
 			this->tabPageSegmentation->BackColor = System::Drawing::Color::Lavender;
+			this->tabPageSegmentation->Controls->Add(this->labelTimer);
 			this->tabPageSegmentation->Controls->Add(this->chartSegMahalonobis);
 			this->tabPageSegmentation->Controls->Add(this->chartSegOklit);
 			this->tabPageSegmentation->Controls->Add(this->chartSegOrj);
@@ -662,6 +669,45 @@ namespace CppWinForm2 {
 			this->chartSegOklit->Size = System::Drawing::Size(439, 230);
 			this->chartSegOklit->TabIndex = 47;
 			this->chartSegOklit->Text = L"chartSegmentation";
+			// 
+			// chartSegOrj
+			// 
+			chartArea4->Name = L"ChartArea1";
+			this->chartSegOrj->ChartAreas->Add(chartArea4);
+			legend4->Name = L"Legend1";
+			this->chartSegOrj->Legends->Add(legend4);
+			this->chartSegOrj->Location = System::Drawing::Point(5, 396);
+			this->chartSegOrj->Name = L"chartSegOrj";
+			series10->ChartArea = L"ChartArea1";
+			series10->Color = System::Drawing::Color::Red;
+			series10->IsVisibleInLegend = false;
+			series10->Legend = L"Legend1";
+			series10->Name = L"redPixel";
+			series10->YValuesPerPoint = 6;
+			series11->ChartArea = L"ChartArea1";
+			series11->Color = System::Drawing::Color::Green;
+			series11->IsVisibleInLegend = false;
+			series11->Legend = L"Legend1";
+			series11->Name = L"greenPixel";
+			series11->YValuesPerPoint = 4;
+			series12->ChartArea = L"ChartArea1";
+			series12->Color = System::Drawing::Color::Blue;
+			series12->IsVisibleInLegend = false;
+			series12->Legend = L"Legend1";
+			series12->Name = L"bluePixel";
+			series13->ChartArea = L"ChartArea1";
+			series13->Color = System::Drawing::Color::Gray;
+			series13->IsVisibleInLegend = false;
+			series13->Legend = L"Legend1";
+			series13->Name = L"intensity";
+			series13->YValuesPerPoint = 4;
+			this->chartSegOrj->Series->Add(series10);
+			this->chartSegOrj->Series->Add(series11);
+			this->chartSegOrj->Series->Add(series12);
+			this->chartSegOrj->Series->Add(series13);
+			this->chartSegOrj->Size = System::Drawing::Size(426, 230);
+			this->chartSegOrj->TabIndex = 46;
+			this->chartSegOrj->Text = L"chartSegOrj";
 			// 
 			// buttonProcess
 			// 
@@ -800,44 +846,13 @@ namespace CppWinForm2 {
 			this->pictureBoxSegmentOrj->TabIndex = 29;
 			this->pictureBoxSegmentOrj->TabStop = false;
 			// 
-			// chartSegOrj
+			// labelTimer
 			// 
-			chartArea4->Name = L"ChartArea1";
-			this->chartSegOrj->ChartAreas->Add(chartArea4);
-			legend4->Name = L"Legend1";
-			this->chartSegOrj->Legends->Add(legend4);
-			this->chartSegOrj->Location = System::Drawing::Point(5, 396);
-			this->chartSegOrj->Name = L"chartSegOrj";
-			series10->ChartArea = L"ChartArea1";
-			series10->Color = System::Drawing::Color::Red;
-			series10->IsVisibleInLegend = false;
-			series10->Legend = L"Legend1";
-			series10->Name = L"redPixel";
-			series10->YValuesPerPoint = 6;
-			series11->ChartArea = L"ChartArea1";
-			series11->Color = System::Drawing::Color::Green;
-			series11->IsVisibleInLegend = false;
-			series11->Legend = L"Legend1";
-			series11->Name = L"greenPixel";
-			series11->YValuesPerPoint = 4;
-			series12->ChartArea = L"ChartArea1";
-			series12->Color = System::Drawing::Color::Blue;
-			series12->IsVisibleInLegend = false;
-			series12->Legend = L"Legend1";
-			series12->Name = L"bluePixel";
-			series13->ChartArea = L"ChartArea1";
-			series13->Color = System::Drawing::Color::Gray;
-			series13->IsVisibleInLegend = false;
-			series13->Legend = L"Legend1";
-			series13->Name = L"intensity";
-			series13->YValuesPerPoint = 4;
-			this->chartSegOrj->Series->Add(series10);
-			this->chartSegOrj->Series->Add(series11);
-			this->chartSegOrj->Series->Add(series12);
-			this->chartSegOrj->Series->Add(series13);
-			this->chartSegOrj->Size = System::Drawing::Size(426, 230);
-			this->chartSegOrj->TabIndex = 46;
-			this->chartSegOrj->Text = L"chartSegOrj";
+			this->labelTimer->AutoSize = true;
+			this->labelTimer->Location = System::Drawing::Point(1047, 350);
+			this->labelTimer->Name = L"labelTimer";
+			this->labelTimer->Size = System::Drawing::Size(0, 15);
+			this->labelTimer->TabIndex = 49;
 			// 
 			// MyForm
 			// 
@@ -860,12 +875,12 @@ namespace CppWinForm2 {
 			this->tabPageSegmentation->PerformLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chartSegMahalonobis))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chartSegOklit))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chartSegOrj))->EndInit();
 			this->panelRadioButtonImageMode->ResumeLayout(false);
 			this->panelRadioButtonImageMode->PerformLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxMahalonois))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxOklit))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxSegmentOrj))->EndInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chartSegOrj))->EndInit();
 			this->ResumeLayout(false);
 
 		}
