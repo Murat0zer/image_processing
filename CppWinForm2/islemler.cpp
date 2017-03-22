@@ -414,16 +414,39 @@ INT * Islemler::vectorToArray(INT * myArray, vector<int> vector)
 	}
 	return myArray;
 }
+System::Void Islemler::setNewPixelValue(byte *bufferValue, INT * thresholdsValues, int thresholdSize)
+{
+	for (int j = 0; j < thresholdSize; j++)
+	{
+		if (*bufferValue < thresholdsValues[j])
+		{
+			if (j - 1 < 0)
+			{
+				*bufferValue = (thresholdsValues[j]) / 2;;
+				return;
+			}
+			else 
+			{				
+				*bufferValue = (thresholdsValues[j] + thresholdsValues[j - 1]) / 2;
+				return;
+			}
+		}
+		
+		if (j + 1 == thresholdSize)
+		{			
+			*bufferValue = (thresholdsValues[j] + 255) / 2;
+			return;
+		}
+	}
+
+	
+}
 BYTE * Islemler::thresholdBasedSegmentationRGB(BYTE * buffer, vector<vector<int>> thresholds, int height, int width)
 {
 	enum Renk { red, green, blue };
-	BYTE * bufferNew = new BYTE[width * height * 3];
-	int rgb = red;
+	BYTE * bufferNew = new BYTE[width*height * 3];
 	vector<vector<int>>::iterator  rgbThresholds = thresholds.begin();
-	//vector<int>::iterator  thresholds = rgbThresholds[red].begin();
 	int thresholdSize = rgbThresholds[red].size();
-	int color = 255 / (thresholdSize + 1);
-
 	// degerleri vector den arraya aliyoruz. daha iyi performans icin.////////////////////////////////////////
 	INT * redThresholds = new INT[rgbThresholds[red].size()];
 	INT * blueThresholds = new INT[rgbThresholds[green].size()];
@@ -433,99 +456,25 @@ BYTE * Islemler::thresholdBasedSegmentationRGB(BYTE * buffer, vector<vector<int>
 	vectorToArray(blueThresholds, rgbThresholds[blue]);
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	for (int i = 0; i < width*height * 3; i += 3)
-	{			
-		int redValue = buffer[i + red];
-		int greenValue = buffer[i + green];
-		int blueValue = buffer[i + blue];
-		int colorX = 1;	
-
-		for (int j = 0; j < thresholdSize; j++)
-		{
-			int newValue = 0;
-			
-			if (redValue < redThresholds[j])
-			{	
-				if (j - 1 < 0)
-					newValue = (redThresholds[j]) / 2;
-				else
-					newValue = (redThresholds[j] + redThresholds[j - 1]) / 2;
-				bufferNew[i + red] = newValue;
-				break;
-			}
-			colorX++;
-			if (colorX - 1 == thresholdSize)
-			{
-				newValue = (redThresholds[j] + 255) / 2;
-				bufferNew[i + red] = newValue;
-			}
-		}
-
-		for (int j = 0; j < thresholdSize; j++)
-		{
-			int newValue = 0;
-			if (greenValue < greenThresholds[j])
-			{
-				if (j - 1 < 0)
-					newValue = (greenThresholds[j]) / 2;
-				else
-					newValue = (greenThresholds[j] + greenThresholds[j - 1]) / 2;
-				bufferNew[i + green] = newValue;
-				break;
-			}
-			colorX++;
-			if (colorX - 1 == thresholdSize)
-			{
-				newValue = (greenThresholds[j] + 255) / 2;
-				bufferNew[i + green] = newValue;
-			}
-		}
-
-		for (int j = 0; j < thresholdSize; j++)
-		{
-			int newValue = 0;
-			if (blueValue < blueThresholds[j])
-			{
-				if (j - 1 < 0)
-					newValue = (blueThresholds[j]) / 2;
-				else
-					newValue = (blueThresholds[j] + blueThresholds[j - 1]) / 2;
-				bufferNew[i + blue] = newValue;
-				break;
-			}
-			colorX++;
-			if (colorX - 1 == thresholdSize)
-			{
-				newValue = (blueThresholds[j] + 255) / 2;
-				bufferNew[i + blue] = newValue;
-			}
-		}
-			
+	{	
+		bufferNew[i + red] = buffer[i+red];
+		bufferNew[i + green] = buffer[i + green];
+		bufferNew[i + blue] = buffer[i + blue];
+		setNewPixelValue(&bufferNew[i + red], redThresholds, thresholdSize);
+		setNewPixelValue(&bufferNew[i+green], greenThresholds, thresholdSize);		
+		setNewPixelValue(&bufferNew[i+blue], blueThresholds, thresholdSize);			
 	}
 	return bufferNew;
 }
 
 System::Void Islemler::thresholdBasedSegmentationIntensity(BYTE * buffer, vector<int> thresholds, int height, int width)
 {
-	long pozisyon = 0;
-	int color = 255 / (thresholds.size()+1);
-	vector<int>::iterator  threshold = thresholds.begin();
-	
-		for (int row = 0; row < height; row++)				// Resmin pixellerini dolasmak
-			for (int column = 0; column < width; column++) // icin gerekli.
-			{
-				int colorX = 1;
-				pozisyon = (row) * (width)+column;
-				for each(int thrshld in thresholds)
-				{	
-					
-					if (buffer[pozisyon] < thrshld)
-					{
-						buffer[pozisyon] = color * colorX;
-						break;
-					}
-					colorX++;
-					if(colorX-1 == thresholds.size())
-						buffer[pozisyon] = color * colorX;
-				}
-			}	
+	int thresholdSize = thresholds.size();
+	INT * thresholdArray = new INT[thresholdSize];
+	for (int i = 0; i < height*width; i++)
+	{
+		setNewPixelValue(&buffer[i], thresholdArray, thresholdSize);
+		
+	}
+	delete[] thresholdArray;
 }

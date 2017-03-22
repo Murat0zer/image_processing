@@ -16,7 +16,7 @@ private:
 	vector<int> calculateThreshold(vector<Vertex*> histogram, int renkAdet, String ^ mode);
 	vector<Vertex*> rastgeleAgirlikMerkezleriOlustur(int renkAdet);
 	INT * vectorToArray(INT * myArray, vector<int> vector);
-
+	System::Void setNewPixelValue(byte *bufferValue, INT * thresholdsValues, int thresholdSize);
 public:
 	Islemler();
 	~Islemler();
