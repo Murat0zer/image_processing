@@ -296,41 +296,56 @@ System::Void CppWinForm2::MyForm::buttonProcess_Click(System::Object ^ sender, S
 	catch (FormatException ^e) {
 		MessageBox::Show("Gecersiz deger");
 	}
+	vector<MATRIX*> inverCovariances;
+	for (int i = 0; i < renkAdet; i++)
+		inverCovariances.push_back(new MATRIX(3, 3));
 	vector<Vertex*>  histogram;
 	histogram = islem.histogramHesapla(resim->getBuffer(), *resim->getWidth(), *resim->getHeight(), "rgb");
 	islem.histogramCiz(histogram, chartSegOrj, "rgb");
 	
+	vector<Vertex*> agirlikMerkezleri;
+	BYTE * buffer;
 	if (radioButtonRGB->Checked)
 	{		
-		
 		if (radioButtonOklit->Checked)
-		{
-			BYTE * buffer;
-			vector<vector<int>> thresholds = islem.calculateRgbOklitThreshold(histogram, renkAdet);
+		{			
+			agirlikMerkezleri = islem.calculateRGBThreshold(histogram, renkAdet, "oklit", inverCovariances);
 			
 			buffer = islem.thresholdBasedSegmentationRGB(
 				resim->getBuffer(),
-				thresholds,
+				agirlikMerkezleri,
 				*resim->getHeight(),
-				*resim->getWidth());
-			long  newSize = (*resim->getWidth() * *resim->getHeight() * 3);
-			if (!SaveBMP(buffer,
 				*resim->getWidth(),
-				*resim->getHeight(),
-				newSize,
-				stringToLPCTSTR(textBoxSegment->Text)))
-			{
-				MessageBox::Show("islem basarisiz"); return;
-			}
-			pictureBoxOklit->Image = Image::FromStream(gcnew  MemoryStream(File::ReadAllBytes(textBoxSegment->Text)));
-			resim->setOutput(stringToLPCTSTR(textBoxSegment->Text));
-			histogram = islem.histogramHesapla(buffer, *resim->getWidth(), *resim->getHeight(), "rgb");
-			islem.histogramCiz(histogram, chartSegOklit, "rgb");
+				histogram,
+				"oklit",
+				inverCovariances);
 		}
 		if (radioButtonMahalonobis->Checked)
-		{
+		{			
+			agirlikMerkezleri = islem.calculateRGBThreshold(histogram, renkAdet, "mah", inverCovariances);
 
+			buffer = islem.thresholdBasedSegmentationRGB(
+				resim->getBuffer(),
+				agirlikMerkezleri,
+				*resim->getHeight(),
+				*resim->getWidth(),
+				histogram,
+				"mah",
+				inverCovariances);
 		}
+		long  newSize = (*resim->getWidth() * *resim->getHeight() * 3);
+		if (!SaveBMP(buffer,
+			*resim->getWidth(),
+			*resim->getHeight(),
+			newSize,
+			stringToLPCTSTR(textBoxSegment->Text)))
+		{
+			MessageBox::Show("islem basarisiz"); return;
+		}
+		pictureBoxOklit->Image = Image::FromStream(gcnew  MemoryStream(File::ReadAllBytes(textBoxSegment->Text)));
+		resim->setOutput(stringToLPCTSTR(textBoxSegment->Text));
+		histogram = islem.histogramHesapla(buffer, *resim->getWidth(), *resim->getHeight(), "rgb");
+		islem.histogramCiz(histogram, chartSegOklit, "rgb");
 	}
 	if (radioButtonIntensity->Checked)
 	{
@@ -347,13 +362,14 @@ System::Void CppWinForm2::MyForm::buttonProcess_Click(System::Object ^ sender, S
 
 		if (radioButtonOklit->Checked)
 		{
-			vector<int> thresholds = islem.calculateIntensityOklitThreshold(histogram, renkAdet);
+			vector<Vertex*> thresholds = islem.calculateIntensityThreshold(histogram, renkAdet, "oklit");
 
 			islem.thresholdBasedSegmentationIntensity(
 				resim->getRawIntensity(),
 				thresholds,
 				*resim->getHeight(),
-				*resim->getWidth());
+				*resim->getWidth(),
+				histogram);
 			resim->setDisplayImage(ConvertIntensityToBMP(
 				resim->getRawIntensity(),
 				*resim->getWidth(),

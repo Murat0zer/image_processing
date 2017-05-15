@@ -17,14 +17,7 @@ namespace MyVector
 			this->Y = y;
 			this->Z = z;
 		}
-		/*Vertex::Vertex(const Vertex & p)
-		{
-			Vertex  vec = new Vertex();
-			vec = p;
-			this->X = vec.getX();
-			this->Y = vec.getY();
-			this->Z = vec.getZ();
-		}*/
+	
 		Vertex::Vertex(Vertex * p)
 		{
 			X = p->getX();
@@ -86,7 +79,7 @@ namespace MyVector
 			return *this;
 		}
 
-		bool Vertex::operator<( Vertex v1)
+		bool Vertex::operator <	(Vertex v1)
 		{
 			return  (this->getX() - v1.getX()) > 0;
 		}

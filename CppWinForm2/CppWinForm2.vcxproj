@@ -141,6 +141,7 @@
     <ClCompile Include="Image_Process1.cpp" />
     <ClCompile Include="imge_bmp.cpp" />
     <ClCompile Include="islemler.cpp" />
+    <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="MyForm.cpp" />
     <ClCompile Include="Resim.cpp" />
     <ClCompile Include="stdafx.cpp" />
@@ -149,6 +150,7 @@
   <ItemGroup>
     <ClInclude Include="imge_bmp.h" />
     <ClInclude Include="islemler.h" />
+    <ClInclude Include="Matrix.h" />
     <ClInclude Include="MyForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>

@@ -3,7 +3,7 @@
 #include "imge_bmp.h"
 #include "MyForm.h"
 #include "Vertex.h"
-
+//#include "Matrix.h"
 //////////////////////////
 #include <iostream>
 #define _USE_MATH_DEFINES
@@ -11,8 +11,8 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
-
-
+#include <random>
+#include <time.h>
 using namespace MyVector;
 using namespace std;
 using namespace System::Collections;
@@ -62,7 +62,7 @@ BYTE * Islemler::daireCiz(BYTE* Buffer, int width, int height, int cemberX, int 
 	return  Buffer;
 }
 BYTE * Islemler::filtreUygula(
-	BYTE * Buffer, int * width, int * height, System::String ^ filtre, int row, int column, float sigma)
+			BYTE * Buffer, int * width, int * height, System::String ^ filtre, int row, int column, float sigma)
 
 {
 	int filterMatrisRow = row;
@@ -275,6 +275,103 @@ BYTE * Islemler::siyahBeyaz(BYTE * buffer, int width, int height, vector<Vertex*
 	return buffer;
 }
 
+MATRIX Islemler::matrixMultiplication(MATRIX matrixA, MATRIX matrixB)
+{
+	MATRIX productMatrix(matrixA.getRow(), matrixB.getColumn());
+	float sum = 0; int j = 1;
+	for (int i = 1; i <= matrixA.getRow(); i++)
+	{		
+		for (j = 1; j <= matrixB.getColumn(); j++)
+		{
+			sum = 0;
+			for (int k = 1; k <= matrixA.getColumn(); k++)
+			{
+				float a = matrixA.Get(i,  k);
+				float b = matrixB.Get(k, j);
+				float carpim = a * b;
+				sum +=  carpim ;
+			}
+			productMatrix.Set(i, j, sum);
+		}
+	}
+	return productMatrix;
+}
+
+MATRIX Islemler::inverseMatrix(MATRIX matrix)
+{
+	int col = matrix.getColumn();
+	int row = matrix.getRow();
+	MATRIX inverseMatrix(row, col);
+	MATRIX augmentedMatrix(row, col * 2);
+///////////// genisletilmis matris olusturma/////////////////////////
+	for (int i = 1; i <= row; i++)
+		for (int j = 1; j <= col * 2; j++)
+		{
+			if (j > col) // birim matris tarafi // kosegen ise 1 degilse 0.
+			{
+				if (j - col == i)
+					augmentedMatrix.Set(i, j, 1);
+				else
+					augmentedMatrix.Set(i, j, 0);
+			}
+			else
+				augmentedMatrix.Set(i, j, matrix.Get(i, j));
+		}
+	//////////////
+	int p = 1; 
+	while (augmentedMatrix.Get(1, 1) == 0)
+		augmentedMatrix = augmentedMatrix.rowSwap(1, p); p++;
+	////////////////////////
+
+	//pivot belirleme.
+	int pivot = 1;  
+	int pivotTemp = pivot;
+	bool done = false;
+	while (pivot <= row)
+	{
+		augmentedMatrix = augmentedMatrix.pivotBelirle(&pivot);
+		augmentedMatrix = augmentedMatrix.pivotKullan(pivotTemp);
+		pivotTemp = pivot;
+	}
+	// genisletilmis matrisde olusan ters matrisi olusturuyorz.
+	for (int i = 1; i <= row; i++)
+		for (int j = col; j <= col * 2; j++)
+			inverseMatrix.Set(i, j - col + 1, augmentedMatrix.Get(i, j - col + 4));
+	/////////////////////////////////////////////////////////////			
+	return inverseMatrix;
+
+}
+
+MATRIX Islemler::covarianceMatrix(vector<Vertex*> pixelKume, Vertex agrlkMerkez, int kumePixelAdet)
+{
+	MATRIX covariance(3,3);
+	MATRIX A(3, kumePixelAdet); 
+		for (int j = 1; j <= kumePixelAdet; j++)
+		{			
+				A.Set(1, j, pixelKume[j-1]->getX() - agrlkMerkez.getX());
+				A.Set(2, j, pixelKume[j-1]->getY() - agrlkMerkez.getY());
+				A.Set(3, j, pixelKume[j-1]->getZ() - agrlkMerkez.getZ());			
+		}
+	MATRIX transposeA(A.getColumn(), A.getRow());
+	transposeA = (matrisTranspoze(A));
+	covariance = matrixMultiplication(A, transposeA);
+	covariance = covariance / kumePixelAdet;
+	
+	return covariance;
+}
+
+MATRIX Islemler::matrisTranspoze(MATRIX matris)
+{
+	MATRIX transpozeMatris(matris.getColumn(), matris.getRow());
+	for(int i=1; i<=matris.getColumn(); i++)
+		for (int j = 1; j <= matris.getRow(); j++)
+		{
+			transpozeMatris.Set(i, j, matris.Get(j, i));
+		}
+	
+	return transpozeMatris;
+}
+
 vector<Vertex*> Islemler::rastgeleAgirlikMerkezleriOlustur(int renkAdet)
 {
 	vector<Vertex*> agirlikMerkezleri;
@@ -285,196 +382,265 @@ vector<Vertex*> Islemler::rastgeleAgirlikMerkezleriOlustur(int renkAdet)
 		agirlikMerkezleri.push_back(new Vertex);
 		agirlikMerkezleri[i]->setX ( a);
 		agirlikMerkezleri[i]->setY (a);
-		agirlikMerkezleri[i]->setZ ( 0);
+		agirlikMerkezleri[i]->setZ ( a);
 		a += alfa;
 	}
 	return agirlikMerkezleri;
 }
-
-
-vector<int> Islemler::calculateThreshold(vector<Vertex*> histogram, int renkAdet,String ^ mode)
+float Islemler::oklitDistance(Vertex pixel, Vertex agirlikMerkez)
 {
-	// 3boyutlu vektor. x y merkezin koordinantlari. ignore z.
+	float distance = Math::Abs(
+		Math::Sqrt(
+			Math::Pow(Math::Abs(agirlikMerkez.getX() - pixel.getX()), 2) +
+			Math::Pow((Math::Abs(agirlikMerkez.getY() - pixel.getY())), 2) +
+			Math::Pow((Math::Abs(agirlikMerkez.getZ() - pixel.getZ())), 2)));
+	return  distance;
+}
+float Islemler::mahalanobisDistance(Vertex pixel, Vertex agirlikMerkez, MATRIX inversCovariance)
+{	
+	Vertex p1 = pixel - agirlikMerkez;
+	MATRIX pixel_agrlkMrkz(3,1);  // vertex to matris
+	pixel_agrlkMrkz.Set(1, 1, p1.getX()); 
+	pixel_agrlkMrkz.Set(2, 1, p1.getY());
+	pixel_agrlkMrkz.Set(3, 1, p1.getZ());
+	MATRIX transpozePixel_AgirlikMerkez = matrisTranspoze(pixel_agrlkMrkz);
+	
+	MATRIX distance = matrixMultiplication(transpozePixel_AgirlikMerkez,
+	matrixMultiplication(inversCovariance, pixel_agrlkMrkz));
+
+	float skalarDistance = distance.Get(1,1);
+	
+	return sqrt(skalarDistance);
+}
+
+vector<Vertex*> Islemler::calculateThreshold(vector<Vertex*> histogram, int renkAdet, String ^ mode, vector<MATRIX*> inverCovariances)
+{
 	vector<Vertex*> agirlikMerkezleri(rastgeleAgirlikMerkezleriOlustur(renkAdet));
 	vector<Vertex*> tempAgirlikMerkezleri(rastgeleAgirlikMerkezleriOlustur(renkAdet));
-	// kumelerin toplam x y degerleri. z kumedeki nokta sayisi.
+	// kumelerin toplam x y z degerleri.
 	vector<Vertex*> clusterSums;
+	// kumelerdeki tum elemanlar. covariance matris icin.
+	vector<vector<Vertex*>> clusters;
+	// kumelerin covariance matrisleri
+	vector<MATRIX*> covarianceMatrices;
+	// pixelin kumelere olan uzakliklari.
 	vector<float> uzakliklar;
-	bool done = false;
+	// kumelerdeki pixel adetleri.
+	vector<int> pixelSayi;
+	// uzaklik karsilastirmasi yapilacak pixel.
+	Vertex pixel = new Vertex();
+
+	for (int i = 0; i < renkAdet; i++) {// bo$ covariance matrisler olusturuluyor.		
+		covarianceMatrices.push_back(new MATRIX(3, 3)); 
+	}
+
+	bool done = false; bool ilkDefa = true;
 	while (!done)
 	{
 		clusterSums.clear();
-		for (int i = 0; i < renkAdet; i++) { clusterSums.push_back(new Vertex()); }
-		for (int i = 0; i < 255; i++)
+		pixelSayi.clear();
+		clusters.clear();
+		
+		for (int i = 0; i < renkAdet; i++) 
+		{ 
+			pixelSayi.push_back(0);
+			clusterSums.push_back(new Vertex()); 
+
+			vector<Vertex*> kume;
+			clusters.push_back(kume);
+			clusters[i].push_back(agirlikMerkezleri[i]);
+		}
+		for (int i = 0; i < 256; i++)
 		{
 			uzakliklar.clear();
 			for (int j = 0; j < renkAdet; j++)
 			{
-				Vertex pixel = new Vertex(); pixel.setX(i); pixel.setY(histogram[i]->getX()); pixel.setZ(0.0);
-				if (mode == "oklit")
+				pixel.setX(histogram[i]->getX());
+				pixel.setY(histogram[i]->getY());
+				pixel.setZ(histogram[i]->getZ());
+				if (mode == "oklit" || (ilkDefa))
 					uzakliklar.push_back(oklitDistance(pixel, agirlikMerkezleri[j]));
 				else
-					;// mahalanobis distance hesabi yapilacak kisim.
+				{
+					if (covarianceMatrices[j]->Get(1, 1) != 0) {
+
+						MATRIX inverseCovariance = inverseMatrix(*covarianceMatrices[j]);
+						*inverCovariances[j] = inverseCovariance;
+						uzakliklar.push_back(mahalanobisDistance(pixel, agirlikMerkezleri[j], inverseCovariance));
+					}
+					else
+						uzakliklar.push_back(INFINITY);
+				}
 			}
 			// noktanin minumum uzaklikta oldugu kumenin indisini dondurur.
 			int minUzaklik = (min_element(uzakliklar.begin(), uzakliklar.end())) - uzakliklar.begin();
 
 			// daha sonra yeni agirlik merkezlerini bulmak uzere degerleri topluyoruz.
-			clusterSums[minUzaklik]->setX(clusterSums[minUzaklik]->getX() + i);
-			clusterSums[minUzaklik]->setY(clusterSums[minUzaklik]->getY() + histogram[i]->getX());
-			clusterSums[minUzaklik]->setZ(clusterSums[minUzaklik]->getZ() + 1);
+			clusterSums[minUzaklik]->setX(clusterSums[minUzaklik]->getX() + pixel.getX());
+			clusterSums[minUzaklik]->setY(clusterSums[minUzaklik]->getY() + pixel.getY());
+			clusterSums[minUzaklik]->setZ(clusterSums[minUzaklik]->getZ() + pixel.getZ());
+			pixelSayi[minUzaklik]++;
+			//mahalanobis			
+			clusters[minUzaklik].push_back(new Vertex(pixel));
 		}
+		ilkDefa = false;
+
+		vector<MATRIX*> tempCovariances;
+		int gerekliEsitlikSayisi = 0;
 		// yeni agirlik merkezleri hesaplaniyor ve test icin mevcut olanlar tempe aktariliyor.
 		for (int k = 0; k < renkAdet; k++)
 		{
 			tempAgirlikMerkezleri[k]->setX(agirlikMerkezleri[k]->getX());
 			tempAgirlikMerkezleri[k]->setY(agirlikMerkezleri[k]->getY());
-			if (clusterSums[k]->getZ() != 0) {
-				agirlikMerkezleri[k]->setX(clusterSums[k]->getX() / clusterSums[k]->getZ());
-				agirlikMerkezleri[k]->setY(clusterSums[k]->getY() / clusterSums[k]->getZ());
+			tempAgirlikMerkezleri[k]->setZ(agirlikMerkezleri[k]->getZ());
+
+			if (pixelSayi[k] != 0) {
+				agirlikMerkezleri[k]->setX(clusterSums[k]->getX() / pixelSayi[k]);
+				agirlikMerkezleri[k]->setY(clusterSums[k]->getY() / pixelSayi[k]);
+				agirlikMerkezleri[k]->setZ(clusterSums[k]->getZ() / pixelSayi[k]);
 			}
+
+			// covariance matrisinin hesaplanmasi.
+			int N = clusters[k].size();
+			tempCovariances.push_back( new MATRIX(*covarianceMatrices[k]));
+			covarianceMatrices[k] = new MATRIX(covarianceMatrix(clusters[k], agirlikMerkezleri[k], N));
+
+
+			// kumeleme isleminin bitip bitmediginin kontrolu.
+			float xTemp = tempAgirlikMerkezleri[k]->getX();
+			float yTemp = tempAgirlikMerkezleri[k]->getY();
+			float zTemp = tempAgirlikMerkezleri[k]->getZ();
+			float xNew = agirlikMerkezleri[k]->getX();
+			float yNew = agirlikMerkezleri[k]->getY();
+			float zNew = agirlikMerkezleri[k]->getZ();
+			if (mode == "mah")
+			{
+				/*MATRIX a = ;
+				MATRIX b = ;*/
+				bool matris = *covarianceMatrices[k] == *tempCovariances[k];
+				if (xTemp == xNew && yTemp == yNew && zTemp == zNew && matris )
+					gerekliEsitlikSayisi++;
+			}
+			else
+				if (xTemp == xNew && yTemp == yNew && zTemp == zNew)
+					gerekliEsitlikSayisi++;
 		}
-		// kumeleme isleminin bitip bitmediginin kontrolu.
-		int gerekliEsitlikSayisi = 0;
-		for (int m = 0; m < renkAdet; m++)
+		
+		
+		/*for (int m = 0; m < renkAdet; m++)
 		{
 			float xTemp = tempAgirlikMerkezleri[m]->getX();
 			float yTemp = tempAgirlikMerkezleri[m]->getY();
+			float zTemp = tempAgirlikMerkezleri[m]->getZ();
 			float xNew = agirlikMerkezleri[m]->getX();
 			float yNew = agirlikMerkezleri[m]->getY();
-			if (xTemp == xNew && yTemp == yNew)
-				gerekliEsitlikSayisi++;
-		}
+			float zNew = agirlikMerkezleri[m]->getZ();
+			if (mode == "mah")
+			{
+				if (xTemp == xNew && yTemp == yNew && zTemp == zNew && covarianceMatrices[m] == tempCovariances[m])
+					gerekliEsitlikSayisi++;
+			}
+			else
+				if (xTemp == xNew && yTemp == yNew && zTemp == zNew)
+					gerekliEsitlikSayisi++;
+
+		}*/
 		if (gerekliEsitlikSayisi == renkAdet)
 			done = true;
-	}
-	// elde ettigimiz agirlik merkezinin x degerleriyle threshold hesapliyoruz.
-	vector<int> thresholds; vector<int> xValues;
 
-	for each(Vertex agirlikMerkez in agirlikMerkezleri)
-		xValues.push_back(agirlikMerkez.getX());
-
-	sort(xValues.begin(), xValues.end());
-	vector<int>::iterator  xValue = xValues.begin();
-	int a = 0;
-	for (int p = 0; p<renkAdet - 1; p++)
-	{
-		int xvalueOld = *xValue++;
-		int threshold = (*xValue + xvalueOld) / 2;
-		thresholds.push_back(threshold);
 	}
-	return thresholds;
-}
-float Islemler::oklitDistance(Vertex pixel, Vertex agirlikMerkez)
-{
-	float distance = Math::Abs(Math::Sqrt(Math::Pow(Math::Abs(agirlikMerkez.getX() - pixel.getX()), 2)
-		+ Math::Pow((Math::Abs(agirlikMerkez.getY() - pixel.getY())), 2)));
-	return  distance;
+	return agirlikMerkezleri;
 }
 
-vector<vector<int>> Islemler::calculateRgbOklitThreshold(vector<Vertex*> histogram, int renkAdet)
+
+vector<Vertex*> Islemler::calculateRGBThreshold(vector<Vertex*> histogram, int renkAdet, String ^ mode, vector<MATRIX*> inverCovariances)
 {	
-	//vector<Vertex*> rgbThresholdss;
-	vector<vector<int>> rgbThresholdss;
-	rgbThresholdss.push_back(calculateIntensityOklitThreshold(histogram, renkAdet));
-	// calculeteintensityoklit threshold histogramin sadece x degerleri icin calisir.once x le y i sonra x le z yi
-	// swapliyoruz boylece histogramdaki rgb degerleri icin ayri ayri thresholdlari elde ediyoruz. :(
-	for (int i = 0; i < 255; i++)
-		histogram[i]->setX(histogram[i]->getY());
-	rgbThresholdss.push_back(this->calculateIntensityOklitThreshold(histogram, renkAdet));
-	for (int i = 0; i < 255; i++)
-		histogram[i]->setX(histogram[i]->getZ());
-	rgbThresholdss.push_back(this->calculateIntensityOklitThreshold(histogram, renkAdet));
-	
-	return rgbThresholdss;
+    return calculateThreshold(histogram, renkAdet, mode, inverCovariances);
 }
 
-vector<int> Islemler::calculateRgbMahalanobisThreshold(vector<Vertex*> histogram, int renkAdet)
-{
-	return vector<int>();
+
+vector<Vertex*> Islemler::calculateIntensityThreshold(vector<Vertex*> histogram, int renkAdet, String ^ mode)
+{	
+	vector<MATRIX*> inverCovariances;
+	return calculateThreshold(histogram, renkAdet, mode, inverCovariances);
 }
 
-vector<int> Islemler::calculateIntensityOklitThreshold(vector<Vertex*> histogram, int renkAdet)
+BYTE * Islemler::thresholdBasedSegmentationRGB(BYTE * buffer, vector<Vertex*> agirlikMerkezleri, int height, int width, 
+	vector<Vertex*> histogram, String  ^ mode, vector<MATRIX*> inverCovariances)
 {
-	return calculateThreshold(histogram, renkAdet, "oklit");
-}
-
-vector<int> Islemler::calculateIntensityMahalanobisThreshold(vector<Vertex*> histogram, int renkAdet)
-{
-	return vector<int>();
-}
-
-INT * Islemler::vectorToArray(INT * myArray, vector<int> vector)
-{
-	int i = 0;
-	for each(int  thresholdValue in vector)
-	{
-		myArray[i] = thresholdValue;
-		i++;
-	}
-	return myArray;
-}
-System::Void Islemler::setNewPixelValue(byte *bufferValue, INT * thresholdsValues, int thresholdSize)
-{
-	for (int j = 0; j < thresholdSize; j++)
-	{
-		if (*bufferValue < thresholdsValues[j])
-		{
-			if (j - 1 < 0)
-			{
-				*bufferValue = (thresholdsValues[j]) / 2;;
-				return;
-			}
-			else 
-			{				
-				*bufferValue = (thresholdsValues[j] + thresholdsValues[j - 1]) / 2;
-				return;
-			}
-		}
-		
-		if (j + 1 == thresholdSize)
-		{			
-			*bufferValue = (thresholdsValues[j] + 255) / 2;
-			return;
-		}
-	}
-
-	
-}
-BYTE * Islemler::thresholdBasedSegmentationRGB(BYTE * buffer, vector<vector<int>> thresholds, int height, int width)
-{
+	srand(time(NULL));
+	#define _SECURE_SCL 0
 	enum Renk { red, green, blue };
-	BYTE * bufferNew = new BYTE[width*height * 3];
-	vector<vector<int>>::iterator  rgbThresholds = thresholds.begin();
-	int thresholdSize = rgbThresholds[red].size();
-	// degerleri vector den arraya aliyoruz. daha iyi performans icin.////////////////////////////////////////
-	INT * redThresholds = new INT[rgbThresholds[red].size()];
-	INT * blueThresholds = new INT[rgbThresholds[green].size()];
-	INT * greenThresholds = new INT[rgbThresholds[blue].size()];
-	vectorToArray(redThresholds, rgbThresholds[red]);
-	vectorToArray(greenThresholds, rgbThresholds[green]);
-	vectorToArray(blueThresholds, rgbThresholds[blue]);
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////
-	for (int i = 0; i < width*height * 3; i += 3)
-	{	
-		bufferNew[i + red] = buffer[i+red];
-		bufferNew[i + green] = buffer[i + green];
-		bufferNew[i + blue] = buffer[i + blue];
-		setNewPixelValue(&bufferNew[i + red], redThresholds, thresholdSize);
-		setNewPixelValue(&bufferNew[i+green], greenThresholds, thresholdSize);		
-		setNewPixelValue(&bufferNew[i+blue], blueThresholds, thresholdSize);			
+	BYTE * bufferNew = new BYTE[width*height * 3];	
+	Vertex pixel = new Vertex();
+	int kumdeAdet = agirlikMerkezleri.size();
+	FLOAT * uzakliklar = new FLOAT[kumdeAdet];
+
+	vector <Vertex*> colors;  colors.reserve(kumdeAdet);
+	for (int k = 0; k < kumdeAdet; k++)
+	{
+		colors.push_back(new Vertex(rand() % 255, rand() % 255, rand() % 255));
 	}
+	for (int i = 0; i < height*width*3; i += 3)
+	{
+		//uzakliklar.clear();
+		pixel.setX(histogram[buffer[i + red]]->getX());
+		pixel.setY(histogram[buffer[i + green]]->getY());
+		pixel.setZ(histogram[buffer[i + blue]]->getZ());
+		for (int j = 0; j < kumdeAdet; j++)
+		{	
+			if (mode == "oklit")
+				uzakliklar[j] = (oklitDistance(pixel, agirlikMerkezleri[j]));
+			else
+				uzakliklar[j] = mahalanobisDistance(pixel, agirlikMerkezleri[j], *inverCovariances[j]);
+		}
+		int minUzaklik = uzakliklar[0]; int minUzaklikKumeIndis = 0;
+		for (int k =1; k<kumdeAdet; k++)
+		{
+			if (uzakliklar[k] < minUzaklik)
+			{
+				minUzaklik = uzakliklar[k];
+				minUzaklikKumeIndis = k;
+			}
+		}
+		bufferNew[i + red] = colors[minUzaklikKumeIndis]->getX();
+		bufferNew[i + blue] = colors[minUzaklikKumeIndis]->getY();
+		bufferNew[i + green] = colors[minUzaklikKumeIndis]->getZ();
+		
+			
+	}
+
 	return bufferNew;
 }
 
-System::Void Islemler::thresholdBasedSegmentationIntensity(BYTE * buffer, vector<int> thresholds, int height, int width)
+System::Void Islemler::thresholdBasedSegmentationIntensity(BYTE * buffer, vector<Vertex*> agirlikMerkezleri, int height, int width, vector<Vertex*> histogram)
 {
-	int thresholdSize = thresholds.size();
-	INT * thresholdArray = new INT[thresholdSize];
+	srand(time(NULL));
+	Vertex pixel = new Vertex();
+	int kumdeAdet = agirlikMerkezleri.size();
+	FLOAT * uzakliklar = new FLOAT[kumdeAdet];
+	vector <Vertex*> colors; colors.reserve(kumdeAdet);
+	for (int k = 0; k < kumdeAdet; k++)
+	{
+		colors.push_back(new Vertex(rand() % 255, rand() % 255, rand() % 255));
+	}
 	for (int i = 0; i < height*width; i++)
 	{
-		setNewPixelValue(&buffer[i], thresholdArray, thresholdSize);
-		
+		pixel.setX(histogram[buffer[i]]->getX());
+		for (int j = 0; j < kumdeAdet; j++)
+		{
+			uzakliklar[j] = (oklitDistance(pixel, agirlikMerkezleri[j]));
+		}
+		float minUzaklik = uzakliklar[0]; int minUzaklikKumeIndis = 0;
+		for (int k = 1; k < kumdeAdet; k++)
+		{
+			if (uzakliklar[k] < minUzaklik)
+			{
+				minUzaklik = uzakliklar[k];
+				minUzaklikKumeIndis = k;
+			}
+		}
+		buffer[i] = colors[minUzaklikKumeIndis]->getX();
 	}
-	delete[] thresholdArray;
+
 }

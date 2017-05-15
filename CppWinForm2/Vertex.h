@@ -23,7 +23,7 @@ namespace MyVector
 			Vertex  operator / (float f);
 			Vertex  operator = (Vertex p);
 			bool	operator < (Vertex v1);
-			bool compare(Vertex  a, Vertex  b);
+			
 			//setters and getters
 			void   setX(float x);
 			void   setY(float y);
