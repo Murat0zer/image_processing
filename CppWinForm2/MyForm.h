@@ -104,8 +104,27 @@ namespace CppWinForm2 {
 	private: System::Windows::Forms::DataVisualization::Charting::Chart^  chartSegOrj;
 	private: System::Windows::Forms::Timer^  timer1;
 	private: System::Windows::Forms::Label^  labelTimer;
-	private: System::ComponentModel::IContainer^  components;
+	private: System::Windows::Forms::TabPage^  tabPage1;
+	private: System::Windows::Forms::Button^  buttonCannyHough;
+	private: System::Windows::Forms::Label^  labelDosyaYoluCanny;
 
+	private: System::Windows::Forms::TextBox^  textBoxDosyaYoluCanny;
+	private: System::Windows::Forms::Button^  buttonResimSecCanny;
+	private: System::Windows::Forms::PictureBox^  pictureBoxCannyNew;
+
+	private: System::Windows::Forms::PictureBox^  pictureBoxCannyGradient;
+
+	private: System::Windows::Forms::PictureBox^  pictureBoxCannyOrj;
+
+
+
+	private: System::ComponentModel::IContainer^  components;
+private: System::Windows::Forms::TextBox^  textBoxTLow;
+private: System::Windows::Forms::TextBox^  textBoxTHigh;
+
+
+
+	private: System::Windows::Forms::TextBox^  textBoxT2;
 
 
 	public:
@@ -125,28 +144,28 @@ namespace CppWinForm2 {
 		void InitializeComponent(void)
 		{
 			this->components = (gcnew System::ComponentModel::Container());
-			System::Windows::Forms::DataVisualization::Charting::ChartArea^  chartArea1 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
-			System::Windows::Forms::DataVisualization::Charting::Legend^  legend1 = (gcnew System::Windows::Forms::DataVisualization::Charting::Legend());
-			System::Windows::Forms::DataVisualization::Charting::Series^  series1 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
-			System::Windows::Forms::DataVisualization::Charting::Title^  title1 = (gcnew System::Windows::Forms::DataVisualization::Charting::Title());
-			System::Windows::Forms::DataVisualization::Charting::ChartArea^  chartArea2 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
-			System::Windows::Forms::DataVisualization::Charting::Legend^  legend2 = (gcnew System::Windows::Forms::DataVisualization::Charting::Legend());
-			System::Windows::Forms::DataVisualization::Charting::Series^  series2 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
-			System::Windows::Forms::DataVisualization::Charting::Series^  series3 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
-			System::Windows::Forms::DataVisualization::Charting::Series^  series4 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
-			System::Windows::Forms::DataVisualization::Charting::Series^  series5 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
-			System::Windows::Forms::DataVisualization::Charting::ChartArea^  chartArea3 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
-			System::Windows::Forms::DataVisualization::Charting::Legend^  legend3 = (gcnew System::Windows::Forms::DataVisualization::Charting::Legend());
-			System::Windows::Forms::DataVisualization::Charting::Series^  series6 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
-			System::Windows::Forms::DataVisualization::Charting::Series^  series7 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
-			System::Windows::Forms::DataVisualization::Charting::Series^  series8 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
-			System::Windows::Forms::DataVisualization::Charting::Series^  series9 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
-			System::Windows::Forms::DataVisualization::Charting::ChartArea^  chartArea4 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
-			System::Windows::Forms::DataVisualization::Charting::Legend^  legend4 = (gcnew System::Windows::Forms::DataVisualization::Charting::Legend());
-			System::Windows::Forms::DataVisualization::Charting::Series^  series10 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
-			System::Windows::Forms::DataVisualization::Charting::Series^  series11 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
-			System::Windows::Forms::DataVisualization::Charting::Series^  series12 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
-			System::Windows::Forms::DataVisualization::Charting::Series^  series13 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::ChartArea^  chartArea5 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
+			System::Windows::Forms::DataVisualization::Charting::Legend^  legend5 = (gcnew System::Windows::Forms::DataVisualization::Charting::Legend());
+			System::Windows::Forms::DataVisualization::Charting::Series^  series14 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::Title^  title2 = (gcnew System::Windows::Forms::DataVisualization::Charting::Title());
+			System::Windows::Forms::DataVisualization::Charting::ChartArea^  chartArea6 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
+			System::Windows::Forms::DataVisualization::Charting::Legend^  legend6 = (gcnew System::Windows::Forms::DataVisualization::Charting::Legend());
+			System::Windows::Forms::DataVisualization::Charting::Series^  series15 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::Series^  series16 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::Series^  series17 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::Series^  series18 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::ChartArea^  chartArea7 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
+			System::Windows::Forms::DataVisualization::Charting::Legend^  legend7 = (gcnew System::Windows::Forms::DataVisualization::Charting::Legend());
+			System::Windows::Forms::DataVisualization::Charting::Series^  series19 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::Series^  series20 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::Series^  series21 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::Series^  series22 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::ChartArea^  chartArea8 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
+			System::Windows::Forms::DataVisualization::Charting::Legend^  legend8 = (gcnew System::Windows::Forms::DataVisualization::Charting::Legend());
+			System::Windows::Forms::DataVisualization::Charting::Series^  series23 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::Series^  series24 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::Series^  series25 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::Series^  series26 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
 			this->tabControl1 = (gcnew System::Windows::Forms::TabControl());
 			this->tabPageCemberCiz = (gcnew System::Windows::Forms::TabPage());
 			this->labelDosyaYolu = (gcnew System::Windows::Forms::Label());
@@ -181,6 +200,7 @@ namespace CppWinForm2 {
 			this->pBoxFHNew = (gcnew System::Windows::Forms::PictureBox());
 			this->pBoxFHOriginal = (gcnew System::Windows::Forms::PictureBox());
 			this->tabPageSegmentation = (gcnew System::Windows::Forms::TabPage());
+			this->labelTimer = (gcnew System::Windows::Forms::Label());
 			this->chartSegMahalonobis = (gcnew System::Windows::Forms::DataVisualization::Charting::Chart());
 			this->chartSegOklit = (gcnew System::Windows::Forms::DataVisualization::Charting::Chart());
 			this->chartSegOrj = (gcnew System::Windows::Forms::DataVisualization::Charting::Chart());
@@ -198,8 +218,17 @@ namespace CppWinForm2 {
 			this->radioButtonOklit = (gcnew System::Windows::Forms::RadioButton());
 			this->pictureBoxOklit = (gcnew System::Windows::Forms::PictureBox());
 			this->pictureBoxSegmentOrj = (gcnew System::Windows::Forms::PictureBox());
+			this->tabPage1 = (gcnew System::Windows::Forms::TabPage());
+			this->textBoxTHigh = (gcnew System::Windows::Forms::TextBox());
+			this->textBoxTLow = (gcnew System::Windows::Forms::TextBox());
+			this->pictureBoxCannyNew = (gcnew System::Windows::Forms::PictureBox());
+			this->pictureBoxCannyGradient = (gcnew System::Windows::Forms::PictureBox());
+			this->pictureBoxCannyOrj = (gcnew System::Windows::Forms::PictureBox());
+			this->buttonCannyHough = (gcnew System::Windows::Forms::Button());
+			this->labelDosyaYoluCanny = (gcnew System::Windows::Forms::Label());
+			this->textBoxDosyaYoluCanny = (gcnew System::Windows::Forms::TextBox());
+			this->buttonResimSecCanny = (gcnew System::Windows::Forms::Button());
 			this->timer1 = (gcnew System::Windows::Forms::Timer(this->components));
-			this->labelTimer = (gcnew System::Windows::Forms::Label());
 			this->tabControl1->SuspendLayout();
 			this->tabPageCemberCiz->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxCember))->BeginInit();
@@ -215,6 +244,10 @@ namespace CppWinForm2 {
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxMahalonois))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxOklit))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxSegmentOrj))->BeginInit();
+			this->tabPage1->SuspendLayout();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxCannyNew))->BeginInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxCannyGradient))->BeginInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxCannyOrj))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// tabControl1
@@ -222,6 +255,7 @@ namespace CppWinForm2 {
 			this->tabControl1->Controls->Add(this->tabPageCemberCiz);
 			this->tabControl1->Controls->Add(this->tabPageFilterHisogram);
 			this->tabControl1->Controls->Add(this->tabPageSegmentation);
+			this->tabControl1->Controls->Add(this->tabPage1);
 			this->tabControl1->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(162)));
 			this->tabControl1->Location = System::Drawing::Point(5, 3);
@@ -397,25 +431,25 @@ namespace CppWinForm2 {
 			// 
 			// chartHistogram
 			// 
-			chartArea1->Name = L"ChartArea1";
-			this->chartHistogram->ChartAreas->Add(chartArea1);
-			legend1->Name = L"Legend1";
-			this->chartHistogram->Legends->Add(legend1);
+			chartArea5->Name = L"ChartArea1";
+			this->chartHistogram->ChartAreas->Add(chartArea5);
+			legend5->Name = L"Legend1";
+			this->chartHistogram->Legends->Add(legend5);
 			this->chartHistogram->Location = System::Drawing::Point(512, 360);
 			this->chartHistogram->Name = L"chartHistogram";
-			series1->ChartArea = L"ChartArea1";
-			series1->IsVisibleInLegend = false;
-			series1->Legend = L"Legend1";
-			series1->Name = L"intensity";
-			this->chartHistogram->Series->Add(series1);
+			series14->ChartArea = L"ChartArea1";
+			series14->IsVisibleInLegend = false;
+			series14->Legend = L"Legend1";
+			series14->Name = L"intensity";
+			this->chartHistogram->Series->Add(series14);
 			this->chartHistogram->Size = System::Drawing::Size(731, 253);
 			this->chartHistogram->TabIndex = 40;
 			this->chartHistogram->Text = L"chartHistogram";
-			title1->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9.75F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			title2->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9.75F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(162)));
-			title1->Name = L"histogram";
-			title1->Text = L"Histogram";
-			this->chartHistogram->Titles->Add(title1);
+			title2->Name = L"histogram";
+			title2->Text = L"Histogram";
+			this->chartHistogram->Titles->Add(title2);
 			this->chartHistogram->Visible = false;
 			// 
 			// buttonBlackWhite
@@ -593,118 +627,126 @@ namespace CppWinForm2 {
 			this->tabPageSegmentation->TabIndex = 2;
 			this->tabPageSegmentation->Text = L"Segmentation";
 			// 
+			// labelTimer
+			// 
+			this->labelTimer->AutoSize = true;
+			this->labelTimer->Location = System::Drawing::Point(1047, 350);
+			this->labelTimer->Name = L"labelTimer";
+			this->labelTimer->Size = System::Drawing::Size(0, 15);
+			this->labelTimer->TabIndex = 49;
+			// 
 			// chartSegMahalonobis
 			// 
-			chartArea2->Name = L"ChartArea1";
-			this->chartSegMahalonobis->ChartAreas->Add(chartArea2);
-			legend2->Name = L"Legend1";
-			this->chartSegMahalonobis->Legends->Add(legend2);
+			chartArea6->Name = L"ChartArea1";
+			this->chartSegMahalonobis->ChartAreas->Add(chartArea6);
+			legend6->Name = L"Legend1";
+			this->chartSegMahalonobis->Legends->Add(legend6);
 			this->chartSegMahalonobis->Location = System::Drawing::Point(823, 396);
 			this->chartSegMahalonobis->Name = L"chartSegMahalonobis";
-			series2->ChartArea = L"ChartArea1";
-			series2->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::StackedColumn;
-			series2->Color = System::Drawing::Color::Red;
-			series2->IsVisibleInLegend = false;
-			series2->Legend = L"Legend1";
-			series2->Name = L"redPixelOrj";
-			series3->ChartArea = L"ChartArea1";
-			series3->Color = System::Drawing::Color::Green;
-			series3->IsVisibleInLegend = false;
-			series3->Legend = L"Legend1";
-			series3->Name = L"greenPixelOrj";
-			series4->ChartArea = L"ChartArea1";
-			series4->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::StackedColumn;
-			series4->Color = System::Drawing::Color::Blue;
-			series4->IsVisibleInLegend = false;
-			series4->Legend = L"Legend1";
-			series4->Name = L"bluePixelOrj";
-			series5->ChartArea = L"ChartArea1";
-			series5->Color = System::Drawing::Color::Gray;
-			series5->IsVisibleInLegend = false;
-			series5->Legend = L"Legend1";
-			series5->Name = L"intensity";
-			this->chartSegMahalonobis->Series->Add(series2);
-			this->chartSegMahalonobis->Series->Add(series3);
-			this->chartSegMahalonobis->Series->Add(series4);
-			this->chartSegMahalonobis->Series->Add(series5);
+			series15->ChartArea = L"ChartArea1";
+			series15->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::StackedColumn;
+			series15->Color = System::Drawing::Color::Red;
+			series15->IsVisibleInLegend = false;
+			series15->Legend = L"Legend1";
+			series15->Name = L"redPixelOrj";
+			series16->ChartArea = L"ChartArea1";
+			series16->Color = System::Drawing::Color::Green;
+			series16->IsVisibleInLegend = false;
+			series16->Legend = L"Legend1";
+			series16->Name = L"greenPixelOrj";
+			series17->ChartArea = L"ChartArea1";
+			series17->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::StackedColumn;
+			series17->Color = System::Drawing::Color::Blue;
+			series17->IsVisibleInLegend = false;
+			series17->Legend = L"Legend1";
+			series17->Name = L"bluePixelOrj";
+			series18->ChartArea = L"ChartArea1";
+			series18->Color = System::Drawing::Color::Gray;
+			series18->IsVisibleInLegend = false;
+			series18->Legend = L"Legend1";
+			series18->Name = L"intensity";
+			this->chartSegMahalonobis->Series->Add(series15);
+			this->chartSegMahalonobis->Series->Add(series16);
+			this->chartSegMahalonobis->Series->Add(series17);
+			this->chartSegMahalonobis->Series->Add(series18);
 			this->chartSegMahalonobis->Size = System::Drawing::Size(424, 230);
 			this->chartSegMahalonobis->TabIndex = 48;
 			this->chartSegMahalonobis->Text = L"chartSegmentation";
 			// 
 			// chartSegOklit
 			// 
-			chartArea3->Name = L"ChartArea1";
-			this->chartSegOklit->ChartAreas->Add(chartArea3);
-			legend3->Name = L"Legend1";
-			this->chartSegOklit->Legends->Add(legend3);
+			chartArea7->Name = L"ChartArea1";
+			this->chartSegOklit->ChartAreas->Add(chartArea7);
+			legend7->Name = L"Legend1";
+			this->chartSegOklit->Legends->Add(legend7);
 			this->chartSegOklit->Location = System::Drawing::Point(409, 396);
 			this->chartSegOklit->Name = L"chartSegOklit";
-			series6->ChartArea = L"ChartArea1";
-			series6->Color = System::Drawing::Color::Red;
-			series6->IsVisibleInLegend = false;
-			series6->Legend = L"Legend1";
-			series6->Name = L"redPixel";
-			series6->YValuesPerPoint = 4;
-			series7->ChartArea = L"ChartArea1";
-			series7->Color = System::Drawing::Color::Green;
-			series7->IsVisibleInLegend = false;
-			series7->Legend = L"Legend1";
-			series7->Name = L"greenPixel";
-			series7->YValuesPerPoint = 4;
-			series8->ChartArea = L"ChartArea1";
-			series8->Color = System::Drawing::Color::Blue;
-			series8->IsVisibleInLegend = false;
-			series8->Legend = L"Legend1";
-			series8->Name = L"bluePixel";
-			series8->YValuesPerPoint = 4;
-			series9->ChartArea = L"ChartArea1";
-			series9->Color = System::Drawing::Color::Gray;
-			series9->IsVisibleInLegend = false;
-			series9->Legend = L"Legend1";
-			series9->Name = L"intensity";
-			this->chartSegOklit->Series->Add(series6);
-			this->chartSegOklit->Series->Add(series7);
-			this->chartSegOklit->Series->Add(series8);
-			this->chartSegOklit->Series->Add(series9);
+			series19->ChartArea = L"ChartArea1";
+			series19->Color = System::Drawing::Color::Red;
+			series19->IsVisibleInLegend = false;
+			series19->Legend = L"Legend1";
+			series19->Name = L"redPixel";
+			series19->YValuesPerPoint = 4;
+			series20->ChartArea = L"ChartArea1";
+			series20->Color = System::Drawing::Color::Green;
+			series20->IsVisibleInLegend = false;
+			series20->Legend = L"Legend1";
+			series20->Name = L"greenPixel";
+			series20->YValuesPerPoint = 4;
+			series21->ChartArea = L"ChartArea1";
+			series21->Color = System::Drawing::Color::Blue;
+			series21->IsVisibleInLegend = false;
+			series21->Legend = L"Legend1";
+			series21->Name = L"bluePixel";
+			series21->YValuesPerPoint = 4;
+			series22->ChartArea = L"ChartArea1";
+			series22->Color = System::Drawing::Color::Gray;
+			series22->IsVisibleInLegend = false;
+			series22->Legend = L"Legend1";
+			series22->Name = L"intensity";
+			this->chartSegOklit->Series->Add(series19);
+			this->chartSegOklit->Series->Add(series20);
+			this->chartSegOklit->Series->Add(series21);
+			this->chartSegOklit->Series->Add(series22);
 			this->chartSegOklit->Size = System::Drawing::Size(439, 230);
 			this->chartSegOklit->TabIndex = 47;
 			this->chartSegOklit->Text = L"chartSegmentation";
 			// 
 			// chartSegOrj
 			// 
-			chartArea4->Name = L"ChartArea1";
-			this->chartSegOrj->ChartAreas->Add(chartArea4);
-			legend4->Name = L"Legend1";
-			this->chartSegOrj->Legends->Add(legend4);
+			chartArea8->Name = L"ChartArea1";
+			this->chartSegOrj->ChartAreas->Add(chartArea8);
+			legend8->Name = L"Legend1";
+			this->chartSegOrj->Legends->Add(legend8);
 			this->chartSegOrj->Location = System::Drawing::Point(5, 396);
 			this->chartSegOrj->Name = L"chartSegOrj";
-			series10->ChartArea = L"ChartArea1";
-			series10->Color = System::Drawing::Color::Red;
-			series10->IsVisibleInLegend = false;
-			series10->Legend = L"Legend1";
-			series10->Name = L"redPixel";
-			series10->YValuesPerPoint = 6;
-			series11->ChartArea = L"ChartArea1";
-			series11->Color = System::Drawing::Color::Green;
-			series11->IsVisibleInLegend = false;
-			series11->Legend = L"Legend1";
-			series11->Name = L"greenPixel";
-			series11->YValuesPerPoint = 4;
-			series12->ChartArea = L"ChartArea1";
-			series12->Color = System::Drawing::Color::Blue;
-			series12->IsVisibleInLegend = false;
-			series12->Legend = L"Legend1";
-			series12->Name = L"bluePixel";
-			series13->ChartArea = L"ChartArea1";
-			series13->Color = System::Drawing::Color::Gray;
-			series13->IsVisibleInLegend = false;
-			series13->Legend = L"Legend1";
-			series13->Name = L"intensity";
-			series13->YValuesPerPoint = 4;
-			this->chartSegOrj->Series->Add(series10);
-			this->chartSegOrj->Series->Add(series11);
-			this->chartSegOrj->Series->Add(series12);
-			this->chartSegOrj->Series->Add(series13);
+			series23->ChartArea = L"ChartArea1";
+			series23->Color = System::Drawing::Color::Red;
+			series23->IsVisibleInLegend = false;
+			series23->Legend = L"Legend1";
+			series23->Name = L"redPixel";
+			series23->YValuesPerPoint = 6;
+			series24->ChartArea = L"ChartArea1";
+			series24->Color = System::Drawing::Color::Green;
+			series24->IsVisibleInLegend = false;
+			series24->Legend = L"Legend1";
+			series24->Name = L"greenPixel";
+			series24->YValuesPerPoint = 4;
+			series25->ChartArea = L"ChartArea1";
+			series25->Color = System::Drawing::Color::Blue;
+			series25->IsVisibleInLegend = false;
+			series25->Legend = L"Legend1";
+			series25->Name = L"bluePixel";
+			series26->ChartArea = L"ChartArea1";
+			series26->Color = System::Drawing::Color::Gray;
+			series26->IsVisibleInLegend = false;
+			series26->Legend = L"Legend1";
+			series26->Name = L"intensity";
+			series26->YValuesPerPoint = 4;
+			this->chartSegOrj->Series->Add(series23);
+			this->chartSegOrj->Series->Add(series24);
+			this->chartSegOrj->Series->Add(series25);
+			this->chartSegOrj->Series->Add(series26);
 			this->chartSegOrj->Size = System::Drawing::Size(426, 230);
 			this->chartSegOrj->TabIndex = 46;
 			this->chartSegOrj->Text = L"chartSegOrj";
@@ -846,13 +888,108 @@ namespace CppWinForm2 {
 			this->pictureBoxSegmentOrj->TabIndex = 29;
 			this->pictureBoxSegmentOrj->TabStop = false;
 			// 
-			// labelTimer
+			// tabPage1
 			// 
-			this->labelTimer->AutoSize = true;
-			this->labelTimer->Location = System::Drawing::Point(1047, 350);
-			this->labelTimer->Name = L"labelTimer";
-			this->labelTimer->Size = System::Drawing::Size(0, 15);
-			this->labelTimer->TabIndex = 49;
+			this->tabPage1->Controls->Add(this->textBoxTHigh);
+			this->tabPage1->Controls->Add(this->textBoxTLow);
+			this->tabPage1->Controls->Add(this->pictureBoxCannyNew);
+			this->tabPage1->Controls->Add(this->pictureBoxCannyGradient);
+			this->tabPage1->Controls->Add(this->pictureBoxCannyOrj);
+			this->tabPage1->Controls->Add(this->buttonCannyHough);
+			this->tabPage1->Controls->Add(this->labelDosyaYoluCanny);
+			this->tabPage1->Controls->Add(this->textBoxDosyaYoluCanny);
+			this->tabPage1->Controls->Add(this->buttonResimSecCanny);
+			this->tabPage1->Location = System::Drawing::Point(4, 24);
+			this->tabPage1->Name = L"tabPage1";
+			this->tabPage1->Padding = System::Windows::Forms::Padding(3);
+			this->tabPage1->Size = System::Drawing::Size(1252, 703);
+			this->tabPage1->TabIndex = 3;
+			this->tabPage1->Text = L"Canny-Hough";
+			this->tabPage1->UseVisualStyleBackColor = true;
+			// 
+			// textBoxTHigh
+			// 
+			this->textBoxTHigh->Location = System::Drawing::Point(440, 570);
+			this->textBoxTHigh->Name = L"textBoxTHigh";
+			this->textBoxTHigh->Size = System::Drawing::Size(100, 21);
+			this->textBoxTHigh->TabIndex = 45;
+			this->textBoxTHigh->Text = L"THigh";
+			// 
+			// textBoxTLow
+			// 
+			this->textBoxTLow->Location = System::Drawing::Point(440, 533);
+			this->textBoxTLow->Name = L"textBoxTLow";
+			this->textBoxTLow->Size = System::Drawing::Size(100, 21);
+			this->textBoxTLow->TabIndex = 44;
+			this->textBoxTLow->Text = L"TLow";
+			// 
+			// pictureBoxCannyNew
+			// 
+			this->pictureBoxCannyNew->BackColor = System::Drawing::Color::LightGray;
+			this->pictureBoxCannyNew->Location = System::Drawing::Point(838, 6);
+			this->pictureBoxCannyNew->Name = L"pictureBoxCannyNew";
+			this->pictureBoxCannyNew->Size = System::Drawing::Size(410, 453);
+			this->pictureBoxCannyNew->SizeMode = System::Windows::Forms::PictureBoxSizeMode::StretchImage;
+			this->pictureBoxCannyNew->TabIndex = 43;
+			this->pictureBoxCannyNew->TabStop = false;
+			// 
+			// pictureBoxCannyGradient
+			// 
+			this->pictureBoxCannyGradient->BackColor = System::Drawing::Color::LightGray;
+			this->pictureBoxCannyGradient->Location = System::Drawing::Point(422, 6);
+			this->pictureBoxCannyGradient->Name = L"pictureBoxCannyGradient";
+			this->pictureBoxCannyGradient->Size = System::Drawing::Size(410, 453);
+			this->pictureBoxCannyGradient->SizeMode = System::Windows::Forms::PictureBoxSizeMode::StretchImage;
+			this->pictureBoxCannyGradient->TabIndex = 42;
+			this->pictureBoxCannyGradient->TabStop = false;
+			// 
+			// pictureBoxCannyOrj
+			// 
+			this->pictureBoxCannyOrj->BackColor = System::Drawing::Color::LightGray;
+			this->pictureBoxCannyOrj->Location = System::Drawing::Point(6, 6);
+			this->pictureBoxCannyOrj->Name = L"pictureBoxCannyOrj";
+			this->pictureBoxCannyOrj->Size = System::Drawing::Size(410, 452);
+			this->pictureBoxCannyOrj->SizeMode = System::Windows::Forms::PictureBoxSizeMode::StretchImage;
+			this->pictureBoxCannyOrj->TabIndex = 41;
+			this->pictureBoxCannyOrj->TabStop = false;
+			// 
+			// buttonCannyHough
+			// 
+			this->buttonCannyHough->Location = System::Drawing::Point(440, 461);
+			this->buttonCannyHough->Name = L"buttonCannyHough";
+			this->buttonCannyHough->Size = System::Drawing::Size(90, 55);
+			this->buttonCannyHough->TabIndex = 40;
+			this->buttonCannyHough->Text = L"Canny-Hough";
+			this->buttonCannyHough->UseVisualStyleBackColor = true;
+			this->buttonCannyHough->Click += gcnew System::EventHandler(this, &MyForm::buttonCannyHough_Click);
+			// 
+			// labelDosyaYoluCanny
+			// 
+			this->labelDosyaYoluCanny->Location = System::Drawing::Point(6, 461);
+			this->labelDosyaYoluCanny->Name = L"labelDosyaYoluCanny";
+			this->labelDosyaYoluCanny->Size = System::Drawing::Size(310, 23);
+			this->labelDosyaYoluCanny->TabIndex = 39;
+			this->labelDosyaYoluCanny->Text = L"Resim sec";
+			this->labelDosyaYoluCanny->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
+			// 
+			// textBoxDosyaYoluCanny
+			// 
+			this->textBoxDosyaYoluCanny->Location = System::Drawing::Point(6, 491);
+			this->textBoxDosyaYoluCanny->Name = L"textBoxDosyaYoluCanny";
+			this->textBoxDosyaYoluCanny->Size = System::Drawing::Size(310, 21);
+			this->textBoxDosyaYoluCanny->TabIndex = 38;
+			this->textBoxDosyaYoluCanny->Text = L"Dosya Yolu";
+			this->textBoxDosyaYoluCanny->TextAlign = System::Windows::Forms::HorizontalAlignment::Center;
+			// 
+			// buttonResimSecCanny
+			// 
+			this->buttonResimSecCanny->Location = System::Drawing::Point(322, 464);
+			this->buttonResimSecCanny->Name = L"buttonResimSecCanny";
+			this->buttonResimSecCanny->Size = System::Drawing::Size(93, 50);
+			this->buttonResimSecCanny->TabIndex = 37;
+			this->buttonResimSecCanny->Text = L"Resim Seç";
+			this->buttonResimSecCanny->UseVisualStyleBackColor = true;
+			this->buttonResimSecCanny->Click += gcnew System::EventHandler(this, &MyForm::buttonResimSecCanny_Click);
 			// 
 			// MyForm
 			// 
@@ -881,6 +1018,11 @@ namespace CppWinForm2 {
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxMahalonois))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxOklit))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxSegmentOrj))->EndInit();
+			this->tabPage1->ResumeLayout(false);
+			this->tabPage1->PerformLayout();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxCannyNew))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxCannyGradient))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxCannyOrj))->EndInit();
 			this->ResumeLayout(false);
 
 		}
@@ -889,7 +1031,7 @@ namespace CppWinForm2 {
 	public: 
 	Resim ^ MyForm::resim = gcnew Resim();
 	Islemler MyForm::islem;
-	System::Boolean MyForm::degerOku(int * row, int * column, float * sigma, String ^ filtreTip);
+	System::Boolean MyForm::degerOku(int * row, int * column, double * sigma, String ^ filtreTip);
 	System::Void MyForm::filtreUygula(String ^ filtreTip);
 	System::Void MyForm::resimYukle(Label ^ labelDosyaYolu, TextBox ^ textBoxKayitYolu, PictureBox ^ picturebox);
 	System::Void MyForm::bmpIntesity(TextBox ^ textBoxKayitYolu,
@@ -909,5 +1051,7 @@ namespace CppWinForm2 {
 	
 	System::Void MyForm::buttonResimSecSegment_Click(System::Object^  sender, System::EventArgs^  e);
 	System::Void MyForm::buttonProcess_Click(System::Object^  sender, System::EventArgs^  e);
+	System::Void MyForm::buttonResimSecCanny_Click(System::Object^  sender, System::EventArgs^  e);
+	System::Void MyForm::buttonCannyHough_Click(System::Object^  sender, System::EventArgs^  e);
 };
 }

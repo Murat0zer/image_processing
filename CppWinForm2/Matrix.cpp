@@ -3,10 +3,10 @@ MATRIX::MATRIX( MATRIX & matrix)
 {
 	row = matrix.row;
 	col = matrix.col;
-	p = new float*[row];
+	p = new double*[row];
 	for (int i = 0; i < row; i++)
 	{
-		p[i] = new float[col];
+		p[i] = new double[col];
 	}
 	for (int i = 1; i <= matrix.row; i++)
 		for (int j = 1; j <= matrix.col; j++)
@@ -17,10 +17,10 @@ MATRIX MATRIX::operator=(const MATRIX & other)
 {
 	row = other.row;
 	col = other.col;
-	p = new float*[row];
+	p = new double*[row];
 	for (int i = 0; i < row; i++)
 	{
-		p[i] = new float[col];
+		p[i] = new double[col];
 	}
 	for (int i = 1; i <= other.row; i++)
 		for (int j = 1; j <= other.col; j++)
@@ -33,19 +33,19 @@ MATRIX::MATRIX(int x, int y)
 {
 	row = x;
 	col = y;
-	p = new float*[x];
+	p = new double*[x];
 	for (int i = 0; i < x; i++)
 	{
-		p[i] = new float[y];
+		p[i] = new double[y];
 	}
 }
-void MATRIX::Set(int a, int b, float d) const
+void MATRIX::Set(int a, int b, double d) const
 {
 	
 	p[a-1][b-1] = d;
 }
 
-float MATRIX::Get(int a, int b) const
+double MATRIX::Get(int a, int b) const
 {
 	return p[a-1][b-1];
 }
@@ -63,7 +63,7 @@ MATRIX MATRIX::rowSwap(int row1, int row2)
 {
 	int col = this->getColumn();
 	int row = this->getRow();
-	float temp = 0;
+	double temp = 0;
 	for (int i = 1; i <= col; i++)
 	{
 		temp = this->Get(row1, i);
@@ -88,7 +88,7 @@ MATRIX MATRIX::pivotBelirle(int * pivot)
 			}
 	}
 	// satir degisme ile pivot belirlenemedi. bolme yapiyoruz.
-	float bolunecek = this->Get(*pivot, *pivot); // pivot olmasi gereken eleman. satiri buna boluyoruz.
+	double bolunecek = this->Get(*pivot, *pivot); // pivot olmasi gereken eleman. satiri buna boluyoruz.
 	*this = this->SatirBol(*pivot, bolunecek);
 	*pivot +=1;
 	return *this;
@@ -107,15 +107,15 @@ MATRIX MATRIX::pivotKullan(int pivot)
 	return *this;
 }
 
-MATRIX MATRIX::SatirIslem(int satir, int satir2, float islem)
+MATRIX MATRIX::SatirIslem(int satir, int satir2, double islem)
 {
 	int row = this->getRow();
 	int col = this->getColumn();
 	for (int i = 1; i <= col; i++)
 	{
-		float value = this->Get(satir2, i);
-		float a = - (value * islem);
-		float nValue = this->Get(satir, i) + a;
+		double value = this->Get(satir2, i);
+		double a = - (value * islem);
+		double nValue = this->Get(satir, i) + a;
 
 		this->Set(satir, i, nValue);
 	}
@@ -123,7 +123,7 @@ MATRIX MATRIX::SatirIslem(int satir, int satir2, float islem)
 	return *this;
 }
 
-MATRIX MATRIX::SatirBol(int satir, float islem)
+MATRIX MATRIX::SatirBol(int satir, double islem)
 {
 	int row = this->getRow();
 	int col = this->getColumn();

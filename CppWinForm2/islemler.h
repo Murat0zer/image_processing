@@ -11,11 +11,11 @@ using namespace System::Windows::Forms::DataVisualization::Charting;
 ref class Islemler
 {
 private:
-	float Islemler::DeegreToRadian(float degree);
+	double Islemler::DeegreToRadian(double degree);
 
-	float oklitDistance(Vertex pixel, Vertex agirlikMerkez);
+	double oklitDistance(Vertex pixel, Vertex agirlikMerkez);
 
-	float mahalanobisDistance(Vertex pixel, Vertex agirlikMerkez, MATRIX inversCovariance);
+	double mahalanobisDistance(Vertex pixel, Vertex agirlikMerkez, MATRIX inversCovariance);
 	// matris sýnýfýnýn  içine  koy bi ara.////////////////
 	MATRIX matrixMultiplication(MATRIX matrixA, MATRIX matrixB);
 	MATRIX covarianceMatrix(vector<Vertex*> pixelKume, Vertex agrlkMerkez, int kumeAdet);
@@ -30,14 +30,14 @@ public:
 	/////////////////////////////////
 	MATRIX inverseMatrix(MATRIX matrix);
 	////////////////////////////////
-	BYTE * daireCiz(BYTE* Buffer, int width, int height, int cemberX, int cemberY, float yaricap );
+	BYTE * daireCiz(BYTE* Buffer, int width, int height, int cemberX, int cemberY, double yaricap );
 
 	BYTE * filtreUygula(BYTE* Buffer,
 						int *width,
 						int *height,
 						System::String ^ filtre,
 						int row,
-						int column, float sigma);
+						int column, double sigma);
 
 	vector<Vertex*> histogramHesapla(BYTE * buffer, int width, int height, String ^ mode);
 	System::Void histogramCiz(vector<Vertex*> histogram, Chart ^ chartHistogram, String ^ mode);

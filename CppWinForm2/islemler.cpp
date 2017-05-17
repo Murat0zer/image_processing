@@ -23,24 +23,24 @@ using namespace System::Windows::Forms::DataVisualization::Charting;
 Islemler::Islemler() {}
 Islemler::~Islemler() {}
 
-float Islemler::DeegreToRadian(float degree)
+double Islemler::DeegreToRadian(double degree)
 {	
 	return degree = degree * M_PI / 180;
 }
 
-BYTE * Islemler::daireCiz(BYTE* Buffer, int width, int height, int cemberX, int cemberY, float yaricap)
+BYTE * Islemler::daireCiz(BYTE* Buffer, int width, int height, int cemberX, int cemberY, double yaricap)
 {	
 	//  1 cm = 38 pixel.
 	const int PIXEL = 38;
-	float alfa = 0;
-	const float cemberCevre = 2 * M_PI * yaricap;
+	double alfa = 0;
+	const double cemberCevre = 2 * M_PI * yaricap;
 	const int pixelSayisi = cemberCevre * 38;
-	const float angleArtirimMiktar = (float)360 / pixelSayisi;
-	const float epsilon = 0.005;
+	const double angleArtirimMiktar = (double)360 / pixelSayisi;
+	const double epsilon = 0.005;
 	long pozisyon = 0;
 	
-	float rowX = yaricap * cos(DeegreToRadian(alfa));
-	float columnY = yaricap * sin(DeegreToRadian(alfa));
+	double rowX = yaricap * cos(DeegreToRadian(alfa));
+	double columnY = yaricap * sin(DeegreToRadian(alfa));
 	
 	pozisyon = (cemberY )* width + cemberX ;
 	Buffer[pozisyon] = 255;
@@ -62,7 +62,7 @@ BYTE * Islemler::daireCiz(BYTE* Buffer, int width, int height, int cemberX, int 
 	return  Buffer;
 }
 BYTE * Islemler::filtreUygula(
-			BYTE * Buffer, int * width, int * height, System::String ^ filtre, int row, int column, float sigma)
+			BYTE * Buffer, int * width, int * height, System::String ^ filtre, int row, int column, double sigma)
 
 {
 	int filterMatrisRow = row;
@@ -79,7 +79,7 @@ BYTE * Islemler::filtreUygula(
 	// gaussian  filtre matrisi hesaplanmasi.
 	if (filtre == "Gaussian")
 	{
-		int X, Y;  float sum = 0;
+		int X, Y;  double sum = 0;
 		for(int y=0; y<filterNatrisColumn; y++)
 			for(int x=0; x < filterMatrisRow; x++)
 			{
@@ -102,7 +102,7 @@ BYTE * Islemler::filtreUygula(
 	for(int row = sinir; row < *height - sinir; row++)				  // Resmin pixellerini dolasmak
 		for (int column = sinir; column < *width  - sinir; column++) // icin gerekli.
 			{
-			float sum = 0;  filterMatrisIndis = 0;
+			double sum = 0;  filterMatrisIndis = 0;
 				for(int filterRow = 0; filterRow < filterNatrisColumn; filterRow++)
 					for(int filterColumn =0; filterColumn < filterMatrisRow; filterColumn++ )
 					{ 
@@ -229,10 +229,10 @@ BYTE * Islemler::siyahBeyaz(BYTE * buffer, int width, int height, vector<Vertex*
 		
 		for (int i = 0; i < 255; i++)
 		{
-			float distanceToClusterOne =  // 2 nokta arasi uzaklik
+			double distanceToClusterOne =  // 2 nokta arasi uzaklik
 				Math::Abs(Math::Sqrt(Math::Pow(Math::Abs(x1 - i), 2)
 					+ Math::Pow((Math::Abs(y1 - histogram[i]->getX())), 2)));
-			float distanceToClusterTwo =
+			double distanceToClusterTwo =
 				Math::Abs(Math::Sqrt(Math::Pow(Math::Abs(x2 - i), 2)
 					+ Math::Pow((Math::Abs(y2 - histogram[i]->getX())), 2)));
 
@@ -278,7 +278,7 @@ BYTE * Islemler::siyahBeyaz(BYTE * buffer, int width, int height, vector<Vertex*
 MATRIX Islemler::matrixMultiplication(MATRIX matrixA, MATRIX matrixB)
 {
 	MATRIX productMatrix(matrixA.getRow(), matrixB.getColumn());
-	float sum = 0; int j = 1;
+	double sum = 0; int j = 1;
 	for (int i = 1; i <= matrixA.getRow(); i++)
 	{		
 		for (j = 1; j <= matrixB.getColumn(); j++)
@@ -286,9 +286,9 @@ MATRIX Islemler::matrixMultiplication(MATRIX matrixA, MATRIX matrixB)
 			sum = 0;
 			for (int k = 1; k <= matrixA.getColumn(); k++)
 			{
-				float a = matrixA.Get(i,  k);
-				float b = matrixB.Get(k, j);
-				float carpim = a * b;
+				double a = matrixA.Get(i,  k);
+				double b = matrixB.Get(k, j);
+				double carpim = a * b;
 				sum +=  carpim ;
 			}
 			productMatrix.Set(i, j, sum);
@@ -387,16 +387,16 @@ vector<Vertex*> Islemler::rastgeleAgirlikMerkezleriOlustur(int renkAdet)
 	}
 	return agirlikMerkezleri;
 }
-float Islemler::oklitDistance(Vertex pixel, Vertex agirlikMerkez)
+double Islemler::oklitDistance(Vertex pixel, Vertex agirlikMerkez)
 {
-	float distance = Math::Abs(
+	double distance = Math::Abs(
 		Math::Sqrt(
 			Math::Pow(Math::Abs(agirlikMerkez.getX() - pixel.getX()), 2) +
 			Math::Pow((Math::Abs(agirlikMerkez.getY() - pixel.getY())), 2) +
 			Math::Pow((Math::Abs(agirlikMerkez.getZ() - pixel.getZ())), 2)));
 	return  distance;
 }
-float Islemler::mahalanobisDistance(Vertex pixel, Vertex agirlikMerkez, MATRIX inversCovariance)
+double Islemler::mahalanobisDistance(Vertex pixel, Vertex agirlikMerkez, MATRIX inversCovariance)
 {	
 	Vertex p1 = pixel - agirlikMerkez;
 	MATRIX pixel_agrlkMrkz(3,1);  // vertex to matris
@@ -408,7 +408,7 @@ float Islemler::mahalanobisDistance(Vertex pixel, Vertex agirlikMerkez, MATRIX i
 	MATRIX distance = matrixMultiplication(transpozePixel_AgirlikMerkez,
 	matrixMultiplication(inversCovariance, pixel_agrlkMrkz));
 
-	float skalarDistance = distance.Get(1,1);
+	double skalarDistance = distance.Get(1,1);
 	
 	return sqrt(skalarDistance);
 }
@@ -424,7 +424,7 @@ vector<Vertex*> Islemler::calculateThreshold(vector<Vertex*> histogram, int renk
 	// kumelerin covariance matrisleri
 	vector<MATRIX*> covarianceMatrices;
 	// pixelin kumelere olan uzakliklari.
-	vector<float> uzakliklar;
+	vector<double> uzakliklar;
 	// kumelerdeki pixel adetleri.
 	vector<int> pixelSayi;
 	// uzaklik karsilastirmasi yapilacak pixel.
@@ -507,12 +507,12 @@ vector<Vertex*> Islemler::calculateThreshold(vector<Vertex*> histogram, int renk
 
 
 			// kumeleme isleminin bitip bitmediginin kontrolu.
-			float xTemp = tempAgirlikMerkezleri[k]->getX();
-			float yTemp = tempAgirlikMerkezleri[k]->getY();
-			float zTemp = tempAgirlikMerkezleri[k]->getZ();
-			float xNew = agirlikMerkezleri[k]->getX();
-			float yNew = agirlikMerkezleri[k]->getY();
-			float zNew = agirlikMerkezleri[k]->getZ();
+			double xTemp = tempAgirlikMerkezleri[k]->getX();
+			double yTemp = tempAgirlikMerkezleri[k]->getY();
+			double zTemp = tempAgirlikMerkezleri[k]->getZ();
+			double xNew = agirlikMerkezleri[k]->getX();
+			double yNew = agirlikMerkezleri[k]->getY();
+			double zNew = agirlikMerkezleri[k]->getZ();
 			if (mode == "mah")
 			{
 				/*MATRIX a = ;
@@ -529,12 +529,12 @@ vector<Vertex*> Islemler::calculateThreshold(vector<Vertex*> histogram, int renk
 		
 		/*for (int m = 0; m < renkAdet; m++)
 		{
-			float xTemp = tempAgirlikMerkezleri[m]->getX();
-			float yTemp = tempAgirlikMerkezleri[m]->getY();
-			float zTemp = tempAgirlikMerkezleri[m]->getZ();
-			float xNew = agirlikMerkezleri[m]->getX();
-			float yNew = agirlikMerkezleri[m]->getY();
-			float zNew = agirlikMerkezleri[m]->getZ();
+			double xTemp = tempAgirlikMerkezleri[m]->getX();
+			double yTemp = tempAgirlikMerkezleri[m]->getY();
+			double zTemp = tempAgirlikMerkezleri[m]->getZ();
+			double xNew = agirlikMerkezleri[m]->getX();
+			double yNew = agirlikMerkezleri[m]->getY();
+			double zNew = agirlikMerkezleri[m]->getZ();
 			if (mode == "mah")
 			{
 				if (xTemp == xNew && yTemp == yNew && zTemp == zNew && covarianceMatrices[m] == tempCovariances[m])
@@ -631,7 +631,7 @@ System::Void Islemler::thresholdBasedSegmentationIntensity(BYTE * buffer, vector
 		{
 			uzakliklar[j] = (oklitDistance(pixel, agirlikMerkezleri[j]));
 		}
-		float minUzaklik = uzakliklar[0]; int minUzaklikKumeIndis = 0;
+		double minUzaklik = uzakliklar[0]; int minUzaklikKumeIndis = 0;
 		for (int k = 1; k < kumdeAdet; k++)
 		{
 			if (uzakliklar[k] < minUzaklik)
