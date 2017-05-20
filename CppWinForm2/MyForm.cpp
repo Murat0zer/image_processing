@@ -436,7 +436,6 @@ System::Void CppWinForm2::MyForm::buttonCannyHough_Click(System::Object ^ sender
 	/////edge detect hough kismi///////////
 	MATRIX gradientMatrix(*resim->getHeight() - 2, *resim->getWidth() - 2);
 	MATRIX cannyMatrix(*resim->getHeight() - 2, *resim->getWidth() - 2);
-	MATRIX gradientBinaryMatrix(*resim->getHeight() - 2, *resim->getWidth() - 2);
 	MATRIX angleMatrix(*resim->getHeight() - 2, *resim->getWidth() - 2);
 	MATRIX angleMatrixDegree(*resim->getHeight() - 2, *resim->getWidth() - 2);
 	MATRIX filtreX(3, 3);
@@ -455,6 +454,8 @@ System::Void CppWinForm2::MyForm::buttonCannyHough_Click(System::Object ^ sender
 	// yeni resmin boyutu.
 	BYTE * newBufferGradient = new BYTE[(*resim->getWidth() - 2 * sinir) * (*resim->getHeight() - 2 * sinir)];
 	BYTE * newBufferCanny	 = new BYTE[(*resim->getWidth() - 2 * sinir) * (*resim->getHeight() - 2 * sinir)];
+
+
 	//// gradient hesabi////
 	double newX = 0;
 	double newY = 0;
@@ -485,26 +486,6 @@ System::Void CppWinForm2::MyForm::buttonCannyHough_Click(System::Object ^ sender
 		}
 	//// gradient hesabi////-----------
 		
-	/////////// direk gradient ile cannysiz  hough icin binary yapalim//////
-	vector<Vertex*>  histogram;
-	histogram = islem.histogramHesapla(
-		newBufferGradient,
-		*resim->getWidth() -2,
-		*resim->getHeight() -2,
-		"intensity");
-	resim->setRawIntensity(islem.siyahBeyaz(
-		newBufferGradient,
-		*resim->getWidth() - 2,
-		*resim->getHeight() - 2,
-		histogram));
-	//// binary degerleri matrise atiyoruz.
-	for (int row = sinir; row < *resim->getHeight() - sinir; row++)				  // Resmin pixellerini dolasmak
-		for (int column = sinir; column < *resim->getWidth() - sinir; column++) // icin gerekli.
-		{
-			pozisyon = (row - sinir) * (*resim->getWidth() - 2 * sinir) + column - sinir;
-			gradientBinaryMatrix.Set(row, column, newBufferGradient[pozisyon]);
-		}
-	/////////// direk gradient ile cannysiz  edge detect//////
 
 	///////canny kismi///////// 
 	//non-max sup//
@@ -588,80 +569,175 @@ System::Void CppWinForm2::MyForm::buttonCannyHough_Click(System::Object ^ sender
 				cannyMatrix.Set(row, column, 0);
 		}
 	// tlow thigh arasi degerleri kenar yonundeki pixel degerlerine bakarak degistiriyoruz.
-	for (int row = 1; row <= cannyMatrix.getRow(); row++)
-		for (int column = 1; column <= cannyMatrix.getColumn(); column++)
-		{
-			int gradientAngle = angleMatrixDegree.Get(row, column);
-			int value = cannyMatrix.Get(row, column);
-			if (value > 0 && value < 255)
-			{	
-				if (gradientAngle == 0)  // 0 a 90 dik
+	bool kontrol = true;
+	int count = 0;
+	while (kontrol)
+	{
+		for (int row = 1; row <= cannyMatrix.getRow(); row++)
+			for (int column = 1; column <= cannyMatrix.getColumn(); column++)
+			{
+				int gradientAngle = angleMatrixDegree.Get(row, column);
+				int value = cannyMatrix.Get(row, column);
+				if (value > 0 && value < 255)
 				{
-					bool a = false;
-					bool b = false;
-					if (row - 1 > 0) // kuzey  eleman kontrol.
-						a = cannyMatrix.Get(row - 1, column) == 255;
-					if (row + 1 <= cannyMatrix.getRow()) // guney  eleman kontrol /
-						//b = cannyMatrix.Get(row + 1, column) == 255;
+					kontrol = false;
+					if (gradientAngle == 0)  // 0 a 90 dik
+					{
+						bool a = false;
+						bool b = false;
+						if (row - 1 > 0) { // kuzey  eleman kontrol.
+							a = cannyMatrix.Get(row - 1, column) == 255;  // komsu 1. pixel 1 yapilir.
+							b = cannyMatrix.Get(row - 1, column) == 0;   //  komsu 0  pixel 0 yapilir.
+						}
+						else // komsu yok
+							cannyMatrix.Set(row, column, 1);
+						if (a)
+							cannyMatrix.Set(row, column, 255);
+						if (b)
+							cannyMatrix.Set(row, column, 0);
+					}
 
-					if (a || b)
-						cannyMatrix.Set(row, column, 255);
-					else
-						cannyMatrix.Set(row, column, 0);
-				}
-
-				if (gradientAngle == 135)  // 135e 45 dik
-				{
-					bool a = false;
-					bool b = false;
-					if (row - 1 > 0 && column + 1 <= cannyMatrix.getColumn()) // kuzey dogu.
-						a = cannyMatrix.Get(row - 1, column + 1) == 255;
-					if (row + 1 < cannyMatrix.getRow() && column - 1 > 0) // guney bati
-						//b = cannyMatrix.Get(row + 1, column - 1) == 255;
-
-					if (a || b)
-						cannyMatrix.Set(row, column, 255);
-					else
-						cannyMatrix.Set(row, column, 0);
-				}
-				if (gradientAngle == 0) // 90a 0 dik.
-				{
-					bool a = false;
-					bool b = false;
-					if (column - 1 > 0 ) // sol eleman
-						//a = cannyMatrix.Get(row , column - 1) == 255;
-					if ( column + 1 <= cannyMatrix.getColumn()) // sag eleman.
-						b = cannyMatrix.Get(row, column + 1) == 255;
-
-					if (a || b)
-						cannyMatrix.Set(row, column, 255);
-					else
-						cannyMatrix.Set(row, column, 0);
-				}
-				if (gradientAngle == 45) // 45e 135 dik.
-				{
-					bool a = false;
-					bool b = false;
-					if (row - 1 > 0 && column - 1 > 0) // kuzey bati.
-						a = cannyMatrix.Get(row - 1, column - 1) == 255;
-					if (row + 1 < cannyMatrix.getRow() && column + 1 <= cannyMatrix.getColumn()) // guney dogu
-						//b = cannyMatrix.Get(row + 1, column + 1) == 255;
-
-					if (a || b)
-						cannyMatrix.Set(row, column, 255);
-					else
-						cannyMatrix.Set(row, column, 0);
+					if (gradientAngle == 135)  // 135e 45 dik
+					{
+						bool a = false;
+						bool b = false;
+						if (row - 1 > 0 && column + 1 <= cannyMatrix.getColumn()) {
+							a = cannyMatrix.Get(row - 1, column + 1) == 255;  // komsu 1. pixel 1 yapilir.
+							b = cannyMatrix.Get(row - 1, column + 1) == 0;   //  komsu 0  pixel 0 yapilir.
+						}
+						else // komsu yok
+							cannyMatrix.Set(row, column, 1);
+						if (a)
+							cannyMatrix.Set(row, column, 255);
+						if (b)
+							cannyMatrix.Set(row, column, 0);
+					}
+					if (gradientAngle == 90) // 90a 0 dik.
+					{
+						bool a = false;
+						bool b = false;
+						if (column + 1 <= cannyMatrix.getColumn()) {
+							a = cannyMatrix.Get(row , column + 1) == 255;  // komsu 1. pixel 1 yapilir.
+							b = cannyMatrix.Get(row , column + 1) == 0;   //  komsu 0  pixel 0 yapilir.
+						}
+						else // komsu yok
+							cannyMatrix.Set(row, column, 1);
+						if (a)
+							cannyMatrix.Set(row, column, 255);
+						if (b)
+							cannyMatrix.Set(row, column, 0);
+					}
+					if (gradientAngle == 45) // 45e 135 dik.
+					{
+						bool a = false;
+						bool b = false;
+						if (row - 1 > 0 && column - 1 > 0) {
+							a = cannyMatrix.Get(row - 1, column -1) == 255;  // komsu 1. pixel 1 yapilir.
+							b = cannyMatrix.Get(row - 1, column -1) == 0;   //  komsu 0  pixel 0 yapilir.
+						}
+						else // komsu yok
+							cannyMatrix.Set(row, column, 1);
+						if (a)
+							cannyMatrix.Set(row, column, 255);
+						if (b)
+							cannyMatrix.Set(row, column, 0);
+					}
 				}
 			}
-		}
+		count++;
+		if (!kontrol) { kontrol = true; }
+		else { kontrol = false; }
+		if (count > 8) { kontrol = false; }
+	}
 
-	/////test ////
+	// hough transform
+	MATRIX finalMatrix(*resim->getHeight() - 2, *resim->getWidth() - 2);
+	finalMatrix = cannyMatrix;
+	double d, maxD=0.00;
+	
+	// line detect
+	if (radioButtonLine->Checked)
+	{
+		//acumulator olusturma.//
+		//maksimum d degerini bulma.
+		for (int row = 1; row <= finalMatrix.getRow(); row++)
+			for (int column = 1; column <= finalMatrix.getColumn(); column++)
+			{
+				if (finalMatrix.Get(row, column) != 0)
+				{
+					for (int i = 0; i <= 180; i++)
+					{
+						double angleRadian = i * M_PI / 180;
+						d = Math::Abs(row*Math::Cos(angleRadian) + column* Math::Sin(angleRadian));
+						if (d > maxD) { maxD = d; }
+
+					}
+				}
+			}
+		int acuRow =  (int)(maxD + 0.5);
+		MATRIX acumulator(acuRow, 181);
+		for (int i = 1; i <= acuRow; i++)
+			for (int j = 1; j <= 181; j++)
+				acumulator.Set(i, j, 0);
+			
+		
+		for (int row = 1; row <= finalMatrix.getRow(); row++)
+			for (int column = 1; column <= finalMatrix.getColumn(); column++)
+			{
+				if (finalMatrix.Get(row, column) != 0)
+				{
+					for (int angle = 0; angle <= 180; angle++)
+					{
+						double angleRadian = angle * M_PI / 180;
+						d = Math::Abs(row*Math::Cos(angleRadian) + column* Math::Sin(angleRadian));
+						int dIndis = (int)(d + 0.5); if (dIndis < acuRow) { dIndis++; }
+						acumulator.Set(dIndis, angle+1, acumulator.Get(dIndis, angle+1) + 1);
+					}
+				}
+			}
+		// hough ekrana cizme.///
+		int rowSinir = (acuRow);
+		BYTE * newBufferHough = new BYTE[rowSinir* 180];
+		// hough buffer transfer//
+		
+		for (int row = 0; row < rowSinir; row++)
+			for (int column = 0; column <= 180; column++)
+			{
+				pozisyon = (row) * (180) + column;
+				newBufferHough[pozisyon] = acumulator.Get(row + 1, column + 1);
+			}
+		//hough 
+		resim->setDisplayImage(ConvertIntensityToBMP(
+			newBufferHough,
+			180,
+			rowSinir,
+			resim->getNewSize()));
+
+		if (!SaveBMP(resim->getDisplayImage(),
+			180,
+			rowSinir,
+			*resim->getNewSize(),
+			stringToLPCTSTR(textBoxDosyaYoluCanny->Text)))
+		{
+			MessageBox::Show("islem basarisiz"); return;
+		}
+		pictureBoxHough->Image = Image::FromStream(gcnew  MemoryStream(File::ReadAllBytes(textBoxDosyaYoluCanny->Text)));
+
+
+	}
+		
+	
+	BYTE * newBufferFinal = new BYTE[(*resim->getWidth() - 2 * sinir) * (*resim->getHeight() - 2 * sinir)];
+	
+
+	/////canny buffer transfer ////
 	for (int row = sinir; row < *resim->getHeight() - sinir; row++)				  // Resmin pixellerini dolasmak
 		for (int column = sinir; column < *resim->getWidth() - sinir; column++) // icin gerekli.
 		{
 			pozisyon = (row - sinir) * (*resim->getWidth() - 2 * sinir) + column - sinir;
 			newBufferCanny[pozisyon] = cannyMatrix.Get(row, column);
 		}
+	
 
 	{
 		//////////// resimleri ekrana aktarma kismi.///////////////
@@ -697,6 +773,24 @@ System::Void CppWinForm2::MyForm::buttonCannyHough_Click(System::Object ^ sender
 			MessageBox::Show("islem basarisiz"); return;
 		}
 		pictureBoxCannyNew->Image = Image::FromStream(gcnew  MemoryStream(File::ReadAllBytes(textBoxDosyaYoluCanny->Text)));
+
+
+		// final image
+		resim->setDisplayImage(ConvertIntensityToBMP(
+			newBufferFinal,
+			*resim->getWidth() - 2,
+			*resim->getHeight() - 2,
+			resim->getNewSize()));
+
+		if (!SaveBMP(resim->getDisplayImage(),
+			*resim->getWidth() - 2,
+			*resim->getHeight() - 2,
+			*resim->getNewSize(),
+			stringToLPCTSTR(textBoxDosyaYoluCanny->Text)))
+		{
+			MessageBox::Show("islem basarisiz"); return;
+		}
+		pictureBoxFinal->Image = Image::FromStream(gcnew  MemoryStream(File::ReadAllBytes(textBoxDosyaYoluCanny->Text)));
 	}
 
 }
