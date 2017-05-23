@@ -166,7 +166,7 @@ bool MATRIX::operator!=(const MATRIX & other)
 }
 MATRIX::~MATRIX()
 {
-	for (int i = 0; i < row; i++)
+	/*for (int i = 0; i < row; i++)
 		delete[] p[i];
-	delete[] p;
+	delete[] p;*/
 }

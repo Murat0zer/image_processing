@@ -17,7 +17,9 @@ namespace CppWinForm2 {
 	{
 		double distance = 0;
 		double angle = 0;
-		int adet = 1;
+		int intersect = 0;
+		bool ustTaraf = false;
+	
 	};
 	public ref class MyForm : public System::Windows::Forms::Form
 	{
@@ -131,6 +133,7 @@ private: System::Windows::Forms::PictureBox^  pictureBoxHough;
 private: System::Windows::Forms::PictureBox^  pictureBoxFinal;
 private: System::Windows::Forms::RadioButton^  radioButtonCircle;
 private: System::Windows::Forms::RadioButton^  radioButtonLine;
+private: System::Windows::Forms::TextBox^  textBoxSekilAdet;
 
 
 
@@ -153,7 +156,6 @@ private: System::Windows::Forms::RadioButton^  radioButtonLine;
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			
 			this->components = (gcnew System::ComponentModel::Container());
 			System::Windows::Forms::DataVisualization::Charting::ChartArea^  chartArea1 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
 			System::Windows::Forms::DataVisualization::Charting::Legend^  legend1 = (gcnew System::Windows::Forms::DataVisualization::Charting::Legend());
@@ -179,6 +181,8 @@ private: System::Windows::Forms::RadioButton^  radioButtonLine;
 			System::Windows::Forms::DataVisualization::Charting::Series^  series13 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
 			this->tabControl1 = (gcnew System::Windows::Forms::TabControl());
 			this->tabPage1 = (gcnew System::Windows::Forms::TabPage());
+			this->radioButtonCircle = (gcnew System::Windows::Forms::RadioButton());
+			this->radioButtonLine = (gcnew System::Windows::Forms::RadioButton());
 			this->pictureBoxFinal = (gcnew System::Windows::Forms::PictureBox());
 			this->pictureBoxHough = (gcnew System::Windows::Forms::PictureBox());
 			this->textBoxTHigh = (gcnew System::Windows::Forms::TextBox());
@@ -242,8 +246,7 @@ private: System::Windows::Forms::RadioButton^  radioButtonLine;
 			this->pictureBoxOklit = (gcnew System::Windows::Forms::PictureBox());
 			this->pictureBoxSegmentOrj = (gcnew System::Windows::Forms::PictureBox());
 			this->timer1 = (gcnew System::Windows::Forms::Timer(this->components));
-			this->radioButtonLine = (gcnew System::Windows::Forms::RadioButton());
-			this->radioButtonCircle = (gcnew System::Windows::Forms::RadioButton());
+			this->textBoxSekilAdet = (gcnew System::Windows::Forms::TextBox());
 			this->tabControl1->SuspendLayout();
 			this->tabPage1->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxFinal))->BeginInit();
@@ -283,6 +286,7 @@ private: System::Windows::Forms::RadioButton^  radioButtonLine;
 			// 
 			// tabPage1
 			// 
+			this->tabPage1->Controls->Add(this->textBoxSekilAdet);
 			this->tabPage1->Controls->Add(this->radioButtonCircle);
 			this->tabPage1->Controls->Add(this->radioButtonLine);
 			this->tabPage1->Controls->Add(this->pictureBoxFinal);
@@ -303,6 +307,28 @@ private: System::Windows::Forms::RadioButton^  radioButtonLine;
 			this->tabPage1->TabIndex = 3;
 			this->tabPage1->Text = L"Canny-Hough";
 			this->tabPage1->UseVisualStyleBackColor = true;
+			// 
+			// radioButtonCircle
+			// 
+			this->radioButtonCircle->AutoSize = true;
+			this->radioButtonCircle->Location = System::Drawing::Point(116, 487);
+			this->radioButtonCircle->Name = L"radioButtonCircle";
+			this->radioButtonCircle->Size = System::Drawing::Size(56, 19);
+			this->radioButtonCircle->TabIndex = 49;
+			this->radioButtonCircle->TabStop = true;
+			this->radioButtonCircle->Text = L"Circle";
+			this->radioButtonCircle->UseVisualStyleBackColor = true;
+			// 
+			// radioButtonLine
+			// 
+			this->radioButtonLine->AutoSize = true;
+			this->radioButtonLine->Location = System::Drawing::Point(116, 452);
+			this->radioButtonLine->Name = L"radioButtonLine";
+			this->radioButtonLine->Size = System::Drawing::Size(49, 19);
+			this->radioButtonLine->TabIndex = 48;
+			this->radioButtonLine->TabStop = true;
+			this->radioButtonLine->Text = L"Line";
+			this->radioButtonLine->UseVisualStyleBackColor = true;
 			// 
 			// pictureBoxFinal
 			// 
@@ -1032,27 +1058,13 @@ private: System::Windows::Forms::RadioButton^  radioButtonLine;
 			this->pictureBoxSegmentOrj->TabIndex = 29;
 			this->pictureBoxSegmentOrj->TabStop = false;
 			// 
-			// radioButtonLine
+			// textBoxSekilAdet
 			// 
-			this->radioButtonLine->AutoSize = true;
-			this->radioButtonLine->Location = System::Drawing::Point(116, 452);
-			this->radioButtonLine->Name = L"radioButtonLine";
-			this->radioButtonLine->Size = System::Drawing::Size(49, 19);
-			this->radioButtonLine->TabIndex = 48;
-			this->radioButtonLine->TabStop = true;
-			this->radioButtonLine->Text = L"Line";
-			this->radioButtonLine->UseVisualStyleBackColor = true;
-			// 
-			// radioButtonCircle
-			// 
-			this->radioButtonCircle->AutoSize = true;
-			this->radioButtonCircle->Location = System::Drawing::Point(116, 487);
-			this->radioButtonCircle->Name = L"radioButtonCircle";
-			this->radioButtonCircle->Size = System::Drawing::Size(56, 19);
-			this->radioButtonCircle->TabIndex = 49;
-			this->radioButtonCircle->TabStop = true;
-			this->radioButtonCircle->Text = L"Circle";
-			this->radioButtonCircle->UseVisualStyleBackColor = true;
+			this->textBoxSekilAdet->Location = System::Drawing::Point(116, 512);
+			this->textBoxSekilAdet->Name = L"textBoxSekilAdet";
+			this->textBoxSekilAdet->Size = System::Drawing::Size(100, 21);
+			this->textBoxSekilAdet->TabIndex = 50;
+			this->textBoxSekilAdet->Text = L"Adet";
 			// 
 			// MyForm
 			// 

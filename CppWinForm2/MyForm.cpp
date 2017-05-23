@@ -8,6 +8,7 @@
 #include <msclr\marshal.h>
 #include <vector>
 #include <chrono>  // for high_resolution_clock
+#include <algorithm>
 //User defined includes
 #include "imge_bmp.h"
 #include "islemler.h"
@@ -406,6 +407,11 @@ System::Void CppWinForm2::MyForm::buttonResimSecCanny_Click(System::Object ^ sen
 {
 	resimYukle(labelDosyaYoluCanny, textBoxDosyaYoluCanny, pictureBoxCannyOrj);
 }
+bool compareTopValues(aValue &topValue1, aValue &topValue2)
+{
+	return topValue1.intersect > topValue2.intersect;
+		
+}
 
 System::Void CppWinForm2::MyForm::buttonCannyHough_Click(System::Object ^ sender, System::EventArgs ^ e)
 {
@@ -651,70 +657,72 @@ System::Void CppWinForm2::MyForm::buttonCannyHough_Click(System::Object ^ sender
 	}
 
 	// hough transform
-	MATRIX finalMatrix(*resim->getHeight() - 2, *resim->getWidth() - 2);
-	finalMatrix = cannyMatrix;
+	/*MATRIX finalMatrix(*resim->getHeight() , *resim->getWidth());
+	finalMatrix = cannyMatrix;*/
 	double d, maxD=0.00;
-	
+	BYTE * newBufferFinal = new BYTE[(*resim->getWidth()) * (*resim->getHeight())];
 	// line detect
 	if (radioButtonLine->Checked)
 	{
 		//acumulator olusturma.//
 		//maksimum d degerini bulma.
-		for (int row = 1; row <= finalMatrix.getRow(); row++)
-			for (int column = 1; column <= finalMatrix.getColumn(); column++)
+		for (int row = 1; row <= cannyMatrix.getRow(); row++)
+			for (int column = 1; column <= cannyMatrix.getColumn(); column++)
 			{
-				if (finalMatrix.Get(row, column) != 0)
+				if (cannyMatrix.Get(row, column) != 0)
 				{
 					for (int i = 0; i <= 180; i++)
 					{
 						double angleRadian = i * M_PI / 180;
-						d = Math::Abs(row*Math::Cos(angleRadian) + column* Math::Sin(angleRadian));
+						d = Math::Abs(row*Math::Sin(angleRadian)) + Math::Abs(column* Math::Cos(angleRadian));
 						if (d > maxD) { maxD = d; }
 
 					}
 				}
 			}
-		int acuRow =  (int)(maxD + 0.5);
+		int acuRow = (int)(maxD + 0.5);
 		MATRIX acumulator(acuRow, 181);
 		for (int i = 1; i <= acuRow; i++)
 			for (int j = 1; j <= 181; j++)
 				acumulator.Set(i, j, 0);
-			
-		
-		for (int row = 1; row <= finalMatrix.getRow(); row++)
-			for (int column = 1; column <= finalMatrix.getColumn(); column++)
+
+
+		for (int row = 1; row <= cannyMatrix.getRow(); row++)
+			for (int column = 1; column <= cannyMatrix.getColumn(); column++)
 			{
-				if (finalMatrix.Get(row, column) != 0)
+				if (cannyMatrix.Get(row, column) != 0)
 				{
 					for (int angle = 0; angle <= 180; angle++)
 					{
 						double angleRadian = angle * M_PI / 180;
-						d = Math::Abs(row*Math::Cos(angleRadian) + column* Math::Sin(angleRadian));
-						int dIndis = (int)(d + 0.5); if (dIndis < acuRow) { dIndis++; }
-						acumulator.Set(dIndis, angle+1, acumulator.Get(dIndis, angle+1) + 1);
+						d = Math::Abs(row*Math::Sin(angleRadian) + column* Math::Cos(angleRadian));
+						int dIndis = (int)(d + 0.5); if (dIndis < 1) { dIndis++; }
+						acumulator.Set(dIndis, angle + 1, acumulator.Get(dIndis, angle + 1) + 1);
 					}
 				}
 			}
 		// hough ekrana cizme.///
 		int rowSinir = (acuRow);
-		BYTE * newBufferHough = new BYTE[rowSinir* 180];
+		BYTE * newBufferHough = new BYTE[rowSinir * 181];
 		// hough buffer transfer//
-		
 		for (int row = 0; row < rowSinir; row++)
 			for (int column = 0; column <= 180; column++)
 			{
-				pozisyon = (row) * (180) + column;
-				newBufferHough[pozisyon] = acumulator.Get(row + 1, column + 1);
+				pozisyon = (row) * (181) + column;
+				if (acumulator.Get(row + 1, column + 1) > 255)
+					newBufferHough[pozisyon] = 255;
+				else
+					newBufferHough[pozisyon] = acumulator.Get(row + 1, column + 1);
 			}
 		//hough 
 		resim->setDisplayImage(ConvertIntensityToBMP(
 			newBufferHough,
-			180,
+			181,
 			rowSinir,
 			resim->getNewSize()));
 
 		if (!SaveBMP(resim->getDisplayImage(),
-			180,
+			181,
 			rowSinir,
 			*resim->getNewSize(),
 			stringToLPCTSTR(textBoxDosyaYoluCanny->Text)))
@@ -722,13 +730,177 @@ System::Void CppWinForm2::MyForm::buttonCannyHough_Click(System::Object ^ sender
 			MessageBox::Show("islem basarisiz"); return;
 		}
 		pictureBoxHough->Image = Image::FromStream(gcnew  MemoryStream(File::ReadAllBytes(textBoxDosyaYoluCanny->Text)));
+		// linelari cizdirme.//
+		int adet = Convert::ToInt32(textBoxSekilAdet->Text);
+		vector<aValue> topValues;
+		aValue value;
+		//max acumulator degerlerini bulma.
+		for (int row = 1; row <= acumulator.getRow(); row++)
+			for (int column = 1; column <= acumulator.getColumn(); column++)
+			{
+				if (acumulator.Get(row, column) == 0) { continue; }
+				value.distance = row;
+				value.angle = column;
+				value.intersect = acumulator.Get(row, column);
+				if (row < column)
+					value.ustTaraf = true;
+				if (topValues.size() < adet)
+				{
+					topValues.push_back(value);
+					std::sort(topValues.begin(), topValues.end(), compareTopValues);
+					continue;
+				}
+				int i = 0;
+				int matchIndis = topValues.size();
+				for each(aValue vectorValue in topValues)
+				{
+					int a = acumulator.Get(vectorValue.distance, vectorValue.angle);
+					int b = acumulator.Get(row, column);
+					if (acumulator.Get(vectorValue.distance, vectorValue.angle) < acumulator.Get(row, column))
+					{
+						int a = Math::Abs(vectorValue.distance - value.distance);
+						int b = Math::Abs(vectorValue.angle - value.angle);
+						if ((a < 35 && b < 22.5))						
+							matchIndis = i;						
+						if (i == topValues.size()-1)
+						{
+							if (matchIndis != topValues.size())
+							{
+								topValues.erase(topValues.begin() + matchIndis);
+								topValues.push_back(value);
+								std::sort(topValues.begin(), topValues.end(), compareTopValues);
+								break;
+							}
+							else
+							{
+								topValues.pop_back();
+								topValues.push_back(value);
+								std::sort(topValues.begin(), topValues.end(), compareTopValues);
+								break;
+							}
+						}
+					}
+					i++;
+				}
+			}
+
+		//buffera cizme.
+
+		for (int row = 0; row < *resim->getHeight() ; row++)				  // Resmin pixellerini dolasmak
+			for (int column = 0; column < *resim->getWidth(); column++) // icin gerekli.
+			{
+				pozisyon = row  * *resim->getWidth()  + column;
+				newBufferFinal[pozisyon] = 0;
+
+			}
+		for each(aValue topValue in topValues)
+		{
+			int angle = 0;
+			int distance = topValue.distance;
+			if (topValue.distance < *resim->getHeight() && topValue.distance < *resim->getWidth())
+			{
+				if (((topValue.angle-1 <= 22.5) && (topValue.angle-1 >= -22.5)) || (topValue.angle-1 >= 157.5) || (topValue.angle-1 <= -157.5)) // 0
+				{
+					// angle = 0;
+					for (int row = 0; row < *resim->getHeight(); row++)	 // Resmin pixellerini dolasmak
+					{
+						int column = distance;
+						pozisyon = row  * (*resim->getWidth()) + column;
+
+						newBufferFinal[pozisyon] = 255;
+					}
+					
+					
+				}				
+				if (((topValue.angle-1 >= 67.5) && (topValue.angle-1 <= 112.5)) || ((topValue.angle-1 <= -67.5) && (topValue.angle-1 >= -112.5))) // 90
+				{
+					
+					// angle = 90;
+					for (int column = 0; column < *resim->getHeight(); column++)	 // Resmin pixellerini dolasmak
+					{
+						int row = distance;
+						pozisyon = row  * (*resim->getWidth()) + column;
+						newBufferFinal[pozisyon] = 255;
+					}
+					
+					
+				}
+				if (((topValue.angle-1 >= 22.5) && (topValue.angle-1 <= 67.5)) || ((topValue.angle-1 <= -112.5) && (topValue.angle-1 >= -157.5))) // 45
+				{
+					// angle = 45;
+					distance = (distance / sqrt(2)) + 0.5;
+					int column = distance;
+					for (int row = distance; row >= 0; row--)	   // Resmin pixellerini dolasmak
+						if (column <= *resim->getWidth() && row >= 0) // icin gerekli.
+						{
+							pozisyon = row  * *resim->getWidth() + column;
+							newBufferFinal[pozisyon] = 255;
+							column++;
+						}
+					column = distance;
+					for (int row = distance; row <= *resim->getHeight(); row++)// Resmin pixellerini dolasmak
+						if (column > 0)											  // icin gerekli.
+						{
+							pozisyon = row  * *resim->getWidth() + column;
+							newBufferFinal[pozisyon] = 255;
+							column--;
+						}
+				}
+
+				if (((topValue.angle-1 >= 112.5) && (topValue.angle-1 <= 157.5)) || ((topValue.angle-1 <= -22.5) && (topValue.angle-1 >= -67.5))) // 135
+				{
+					// angle = 135;
+					distance = (distance * sqrt(2)) + 0.5;
+					if (topValue.ustTaraf)
+					{
+						int column = distance;
+						for (int row = 0; row >= 0; row--) // Resmin pixellerini dolasmak
+							if (row >= 0 && column >= 0)						// icin gerekli.
+							{
+								pozisyon = row  * *resim->getWidth() + column;
+								newBufferFinal[pozisyon] = 255;
+								column--;
+							}
+						column = distance;
+						for (int row = 0; row <= *resim->getHeight(); row++)	// Resmin pixellerini dolasmak
+							if (column <= *resim->getWidth() && row <= *resim->getHeight())						// icin gerekli.
+							{
+								pozisyon = row  * *resim->getWidth() + column;
+								newBufferFinal[pozisyon] = 255;
+								column++;
+							}
+					}
+					else
+					{
+						int column = 0;
+						for (int row = distance; row >= 0; row--) // Resmin pixellerini dolasmak
+							if (row >= 0 && column >= 0)						// icin gerekli.
+							{
+								pozisyon = row  * *resim->getWidth() + column;
+								newBufferFinal[pozisyon] = 255;
+								column--;
+							}
+						column = 0;
+						for (int row = distance; row <= *resim->getHeight(); row++)	// Resmin pixellerini dolasmak
+							if (column <= *resim->getWidth() && row <= *resim->getHeight())						// icin gerekli.
+							{
+								pozisyon = row  * *resim->getWidth() + column;
+								newBufferFinal[pozisyon] = 255;
+								column++;
+							}
+					}
+					
+					
+				}
+			}
+
+
+		}
+
 
 
 	}
-		
-	
-	BYTE * newBufferFinal = new BYTE[(*resim->getWidth() - 2 * sinir) * (*resim->getHeight() - 2 * sinir)];
-	
+			
 
 	/////canny buffer transfer ////
 	for (int row = sinir; row < *resim->getHeight() - sinir; row++)				  // Resmin pixellerini dolasmak
@@ -778,13 +950,13 @@ System::Void CppWinForm2::MyForm::buttonCannyHough_Click(System::Object ^ sender
 		// final image
 		resim->setDisplayImage(ConvertIntensityToBMP(
 			newBufferFinal,
-			*resim->getWidth() - 2,
-			*resim->getHeight() - 2,
+			*resim->getWidth() ,
+			*resim->getHeight() ,
 			resim->getNewSize()));
 
 		if (!SaveBMP(resim->getDisplayImage(),
-			*resim->getWidth() - 2,
-			*resim->getHeight() - 2,
+			*resim->getWidth() ,
+			*resim->getHeight() ,
 			*resim->getNewSize(),
 			stringToLPCTSTR(textBoxDosyaYoluCanny->Text)))
 		{
