@@ -440,10 +440,10 @@ System::Void CppWinForm2::MyForm::buttonCannyHough_Click(System::Object ^ sender
 
 	
 	/////edge detect hough kismi///////////
-	MATRIX gradientMatrix(*resim->getHeight() - 2, *resim->getWidth() - 2);
-	MATRIX cannyMatrix(*resim->getHeight() - 2, *resim->getWidth() - 2);
-	MATRIX angleMatrix(*resim->getHeight() - 2, *resim->getWidth() - 2);
-	MATRIX angleMatrixDegree(*resim->getHeight() - 2, *resim->getWidth() - 2);
+	MATRIX gradientMatrix(*resim->getHeight() , *resim->getWidth() );
+	MATRIX cannyMatrix(*resim->getHeight() , *resim->getWidth() );
+	MATRIX angleMatrix(*resim->getHeight() , *resim->getWidth() );
+	MATRIX angleMatrixDegree(*resim->getHeight() , *resim->getWidth() );
 	MATRIX filtreX(3, 3);
 	filtreX.Set(1, 1, -1); filtreX.Set(1, 2, -2); filtreX.Set(1, 3, -1);
 	filtreX.Set(2, 1,  0); filtreX.Set(2, 2,  0); filtreX.Set(2, 3,  0);
@@ -655,7 +655,7 @@ System::Void CppWinForm2::MyForm::buttonCannyHough_Click(System::Object ^ sender
 		else { kontrol = false; }
 		if (count > 8) { kontrol = false; }
 	}
-
+	
 	// hough transform
 	/*MATRIX finalMatrix(*resim->getHeight() , *resim->getWidth());
 	finalMatrix = cannyMatrix;*/
@@ -685,8 +685,11 @@ System::Void CppWinForm2::MyForm::buttonCannyHough_Click(System::Object ^ sender
 		for (int i = 1; i <= acuRow; i++)
 			for (int j = 1; j <= 181; j++)
 				acumulator.Set(i, j, 0);
-
-
+		MATRIX ustAlt(acuRow, 181);
+		for (int i = 1; i <= acuRow; i++)
+			for (int j = 1; j <= 181; j++)
+				acumulator.Set(i, j, 0);
+		
 		for (int row = 1; row <= cannyMatrix.getRow(); row++)
 			for (int column = 1; column <= cannyMatrix.getColumn(); column++)
 			{
@@ -698,6 +701,8 @@ System::Void CppWinForm2::MyForm::buttonCannyHough_Click(System::Object ^ sender
 						d = Math::Abs(row*Math::Sin(angleRadian) + column* Math::Cos(angleRadian));
 						int dIndis = (int)(d + 0.5); if (dIndis < 1) { dIndis++; }
 						acumulator.Set(dIndis, angle + 1, acumulator.Get(dIndis, angle + 1) + 1);
+						if (row*Math::Sin(angleRadian) + column* Math::Cos(angleRadian) < 0)
+							ustAlt.Set(dIndis, angle + 1, 1);
 					}
 				}
 			}
@@ -738,12 +743,19 @@ System::Void CppWinForm2::MyForm::buttonCannyHough_Click(System::Object ^ sender
 		for (int row = 1; row <= acumulator.getRow(); row++)
 			for (int column = 1; column <= acumulator.getColumn(); column++)
 			{
-				if (acumulator.Get(row, column) == 0) { continue; }
+				if (acumulator.Get(row, column) == 0 ) { continue; }
 				value.distance = row;
 				value.angle = column;
 				value.intersect = acumulator.Get(row, column);
-				if (row < column)
+				double mapCol = (double)cannyMatrix.getColumn() / (double)acumulator.getColumn();
+				double mapRow = (double)acumulator.getRow() / (double)cannyMatrix.getRow();
+				int newRow = (((double)row / mapRow) + 0.5);
+				int newCol = (((double)column / mapCol) + 0.5);
+
+				if (ustAlt.Get(row, column) == 1) // 135 derece icin bir kontrol.
 					value.ustTaraf = true;
+				else
+					value.ustTaraf = false;
 				if (topValues.size() < adet)
 				{
 					topValues.push_back(value);
@@ -795,13 +807,14 @@ System::Void CppWinForm2::MyForm::buttonCannyHough_Click(System::Object ^ sender
 			}
 		for each(aValue topValue in topValues)
 		{
+			
 			int angle = 0;
 			int distance = topValue.distance;
 			if (topValue.distance < *resim->getHeight() && topValue.distance < *resim->getWidth())
 			{
 				if (((topValue.angle-1 <= 22.5) && (topValue.angle-1 >= -22.5)) || (topValue.angle-1 >= 157.5) || (topValue.angle-1 <= -157.5)) // 0
 				{
-					// angle = 0;
+					
 					for (int row = 0; row < *resim->getHeight(); row++)	 // Resmin pixellerini dolasmak
 					{
 						int column = distance;
